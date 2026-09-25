@@ -194,7 +194,7 @@ export default function ContactSection() {
                     <input
                       className="w-full px-4 py-3 rounded-lg bg-surface text-on-surface font-body-sm focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-inner border border-outline-variant/20"
                       id="contact-phone"
-                      placeholder="+91 98765 00000"
+                      placeholder="+91 93633 10787"
                       required
                       type="tel"
                       value={formData.phone}
@@ -208,7 +208,7 @@ export default function ContactSection() {
                     <input
                       className="w-full px-4 py-3 rounded-lg bg-surface text-on-surface font-body-sm focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-inner border border-outline-variant/20"
                       id="contact-email"
-                      placeholder="ramesh@company.com"
+                      placeholder="name@company.com"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}

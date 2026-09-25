@@ -129,7 +129,7 @@ export default function ProductRFQModal({
               </label>
               <input
                 className="w-full mt-1 p-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container border border-outline-variant/20"
-                placeholder="+91 98765 00000"
+                placeholder="+91 93633 10787"
                 required
                 type="tel"
                 value={formData.phone}

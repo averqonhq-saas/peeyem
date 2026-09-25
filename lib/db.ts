@@ -58,10 +58,10 @@ const INITIAL_TESTIMONIALS: DbTestimonial[] = [
     profile_image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     testimonial: "Peeyem Traders supplied 450 meters of M-24 grade conveyor belting for our granite crushing line. Zero downtime over 18 months under harsh quarry loads.",
-    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    youtube_video_id: "dQw4w9WgXcQ",
-    embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0",
-    thumbnail_url: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+    youtube_url: "https://www.youtube.com/watch?v=W1YV5piOBmw",
+    youtube_video_id: "W1YV5piOBmw",
+    embed_url: "https://www.youtube.com/embed/W1YV5piOBmw?rel=0",
+    thumbnail_url: "https://img.youtube.com/vi/W1YV5piOBmw/hqdefault.jpg",
     is_active: true,
     display_order: 1,
     created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
@@ -92,10 +92,10 @@ const INITIAL_TESTIMONIALS: DbTestimonial[] = [
     profile_image_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     testimonial: "Outstanding quality food-grade PVC and oil resistant rubber sheeting. Consistent thickness and superior chemical resilience across our processing lines.",
-    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    youtube_video_id: "dQw4w9WgXcQ",
-    embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0",
-    thumbnail_url: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+    youtube_url: "https://www.youtube.com/watch?v=8lmBMYr8H6g",
+    youtube_video_id: "8lmBMYr8H6g",
+    embed_url: "https://www.youtube.com/embed/8lmBMYr8H6g?rel=0",
+    thumbnail_url: "https://img.youtube.com/vi/8lmBMYr8H6g/hqdefault.jpg",
     is_active: true,
     display_order: 3,
     created_at: new Date(Date.now() - 7 * 86400000).toISOString(),
@@ -106,12 +106,12 @@ const INITIAL_TESTIMONIALS: DbTestimonial[] = [
 const INITIAL_VIDEOS: DbPromotionVideo[] = [
   {
     id: "vid-1",
-    title: "Heavy Duty Chevron Conveyor Belting Operational Field Test",
-    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    youtube_video_id: "dQw4w9WgXcQ",
-    thumbnail_url: "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0",
-    description: "Demonstration of 25mm cleat chevron conveyor belt handling high-moisture aggregate up to a 35 degree incline without backslide.",
+    title: "Heavy Duty Fabric Conveyor Belting Splicing & Jointing",
+    youtube_url: "https://www.youtube.com/watch?v=W1YV5piOBmw",
+    youtube_video_id: "W1YV5piOBmw",
+    thumbnail_url: "https://img.youtube.com/vi/W1YV5piOBmw/hqdefault.jpg",
+    embed_url: "https://www.youtube.com/embed/W1YV5piOBmw?rel=0",
+    description: "Step-by-step industrial fabric conveyor belt splicing and vulcanization procedure for heavy aggregate transport lines.",
     size: "wide",
     is_active: true,
     is_featured: true,
@@ -121,7 +121,7 @@ const INITIAL_VIDEOS: DbPromotionVideo[] = [
   },
   {
     id: "vid-2",
-    title: "Industrial Conveyor Belt Hot Splicing & Jointing",
+    title: "Industrial Conveyor Belt Hot Press Vulcanizing",
     youtube_url: "https://www.youtube.com/watch?v=yPYZpwSpKmA",
     youtube_video_id: "yPYZpwSpKmA",
     thumbnail_url: "https://img.youtube.com/vi/yPYZpwSpKmA/hqdefault.jpg",
@@ -136,12 +136,12 @@ const INITIAL_VIDEOS: DbPromotionVideo[] = [
   },
   {
     id: "vid-3",
-    title: "Heavy Quarry Aggregate Impact & Continuous Transport Demo",
-    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    youtube_video_id: "dQw4w9WgXcQ",
-    thumbnail_url: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0",
-    description: "Multi-ply high tensile fabric carcass belting under continuous high-capacity granite aggregate transfer.",
+    title: "Industrial Rubber & PVC Conveyor Belt Manufacturing",
+    youtube_url: "https://www.youtube.com/watch?v=tCne0Gwgczs",
+    youtube_video_id: "tCne0Gwgczs",
+    thumbnail_url: "https://img.youtube.com/vi/tCne0Gwgczs/hqdefault.jpg",
+    embed_url: "https://www.youtube.com/embed/tCne0Gwgczs?rel=0",
+    description: "Automated calender curing and multi-ply fabric reinforcement manufacturing for high tensile industrial belting.",
     size: "compact",
     is_active: true,
     is_featured: false,
@@ -155,8 +155,8 @@ const INITIAL_ENQUIRIES: DbEnquiry[] = [
   {
     id: "enq-101",
     name: "Arun Kumar",
-    phone: "9876543210",
-    email: "arun.kumar@gmail.com",
+    phone: "+91 94433 51280",
+    email: "arunkumar.quarry@gmail.com",
     subject: "Bulk Chevron Belt Order",
     product_id: "chevron-belts",
     message: "We need 120 meters of 800mm width 3-ply chevron belting with 15mm cleats for our aggregate screen conveyor. Please provide pricing and delivery timeline to Karur.",
@@ -167,8 +167,8 @@ const INITIAL_ENQUIRIES: DbEnquiry[] = [
   {
     id: "enq-102",
     name: "K. Mohanraj",
-    phone: "9843219876",
-    email: "mohanraj@velantraders.com",
+    phone: "+91 98432 19876",
+    email: "mohanraj@velanmining.in",
     subject: "Hot Jointing & Fasteners",
     product_id: "belt-fasteners",
     message: "Urgent quote needed for 14# plate fasteners (5 boxes) and 100 meters of skirt rubber 10mm thickness.",
@@ -180,7 +180,7 @@ const INITIAL_ENQUIRIES: DbEnquiry[] = [
   {
     id: "enq-103",
     name: "Priya Sundaram",
-    phone: "9798765432",
+    phone: "+91 98422 73190",
     email: "priya@sundaramfoods.in",
     subject: "White PVC Food Grade Belting",
     product_id: "industrial-belts",
@@ -647,7 +647,8 @@ export const dbService = {
     }
     const local = getLocal<DbTestimonial[]>("testimonials", INITIAL_TESTIMONIALS);
     const enriched = local.map((t) => {
-      if (!t.youtube_url) {
+      // Migrate legacy Rickroll dummy or empty youtube link to real industry video
+      if (!t.youtube_url || t.youtube_video_id === "dQw4w9WgXcQ" || t.youtube_url?.includes("dQw4w9WgXcQ")) {
         const init = INITIAL_TESTIMONIALS.find((it) => it.id === t.id);
         if (init?.youtube_url) {
           return { ...t, ...init };
@@ -770,6 +771,11 @@ export const dbService = {
     }
     const local = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
     const enriched = local.map((v) => {
+      // Migrate legacy Rickroll dummy or outdated video
+      if (v.youtube_video_id === "dQw4w9WgXcQ" || v.youtube_url?.includes("dQw4w9WgXcQ")) {
+        const init = INITIAL_VIDEOS.find((iv) => iv.id === v.id);
+        if (init) return { ...v, ...init };
+      }
       if (!v.size) {
         const init = INITIAL_VIDEOS.find((iv) => iv.id === v.id);
         return { ...v, size: init?.size || "wide" };
@@ -863,7 +869,14 @@ export const dbService = {
       }
     }
     const local = getLocal<DbEnquiry[]>("enquiries", INITIAL_ENQUIRIES);
-    return [...local].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const enriched = local.map((e) => {
+      if (e.phone === "9876543210" || e.phone === "9798765432") {
+        const init = INITIAL_ENQUIRIES.find((ie) => ie.id === e.id);
+        if (init) return { ...e, ...init };
+      }
+      return e;
+    });
+    return [...enriched].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   },
 
   async addEnquiry(data: Omit<DbEnquiry, "id" | "created_at" | "updated_at" | "status"> & { status?: EnquiryStatus }): Promise<DbEnquiry> {

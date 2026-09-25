@@ -296,7 +296,7 @@ export default function ContactRFQSection() {
                           id="phone"
                           name="phone"
                           pattern="[0-9]{10}"
-                          placeholder="98765 00000"
+                          placeholder="93633 10787"
                           required
                           type="tel"
                           value={formData.phone}
@@ -313,7 +313,7 @@ export default function ContactRFQSection() {
                         className="w-full px-space-md py-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary border border-outline-variant/20"
                         id="email"
                         name="email"
-                        placeholder="suresh@company.com"
+                        placeholder="contact@company.com"
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}

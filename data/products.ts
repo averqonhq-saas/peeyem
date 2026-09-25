@@ -114,9 +114,9 @@ export const COMPANY_INFO = {
   name: "Peeyem Traders",
   tagline: "Industrial Conveyor & Rubber Solutions",
   address: "16, M.M.A. Market, South Ukkadam, Coimbatore, Tamil Nadu – 641001",
-  phone: "+91 98765 43210",
-  phoneRaw: "+919876543210",
-  email: "info@peeyemtraders.com",
-  mapsUrl: "https://maps.google.com/?q=South+Ukkadam+Coimbatore",
+  phone: "+91 93633 10787",
+  phoneRaw: "+919363310787",
+  email: "peeyemtraders16@gmail.com",
+  mapsUrl: "https://maps.google.com/?q=Peeyem+Traders+South+Ukkadam+Coimbatore",
   logoUrl: "/logo.svg",
 };

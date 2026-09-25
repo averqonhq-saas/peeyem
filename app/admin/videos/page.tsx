@@ -394,7 +394,7 @@ function VideosContent() {
                 </div>
               ) : youtubeUrl ? (
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
-                  Please enter a valid YouTube URL (e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+                  Please enter a valid YouTube URL (e.g. https://www.youtube.com/watch?v=W1YV5piOBmw).
                 </div>
               ) : null}
 

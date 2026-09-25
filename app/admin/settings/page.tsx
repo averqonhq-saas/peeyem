@@ -12,7 +12,7 @@ export default function AdminSettingsPage() {
   const [phone, setPhone] = useState(COMPANY_INFO.phone);
   const [email, setEmail] = useState(COMPANY_INFO.email);
   const [address, setAddress] = useState(COMPANY_INFO.address);
-  const [whatsapp, setWhatsapp] = useState("+91 98765 43210");
+  const [whatsapp, setWhatsapp] = useState(COMPANY_INFO.phone);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [seedingLoading, setSeedingLoading] = useState(false);
   const [seedSuccess, setSeedSuccess] = useState(false);

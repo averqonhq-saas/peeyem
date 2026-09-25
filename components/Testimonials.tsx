@@ -29,7 +29,7 @@ export default function Testimonials() {
   const currentReview = testimonials[activeReviewIndex] || testimonials[0];
   const currentVideoId =
     currentReview.youtube_video_id ||
-    (currentReview.youtube_url ? parseYouTubeUrl(currentReview.youtube_url)?.videoId : "dQw4w9WgXcQ");
+    (currentReview.youtube_url ? parseYouTubeUrl(currentReview.youtube_url)?.videoId : "W1YV5piOBmw");
   const currentEmbedUrl = currentReview.embed_url || `https://www.youtube.com/embed/${currentVideoId}?rel=0`;
   const currentThumbnail =
     currentReview.thumbnail_url || `https://img.youtube.com/vi/${currentVideoId}/hqdefault.jpg`;
@@ -223,7 +223,7 @@ export default function Testimonials() {
               {testimonials.map((t, idx) => {
                 const vid =
                   t.youtube_video_id ||
-                  (t.youtube_url ? parseYouTubeUrl(t.youtube_url)?.videoId : "dQw4w9WgXcQ");
+                  (t.youtube_url ? parseYouTubeUrl(t.youtube_url)?.videoId : "W1YV5piOBmw");
                 const thumb = t.thumbnail_url || `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
                 const isSelected = idx === activeReviewIndex;
 
