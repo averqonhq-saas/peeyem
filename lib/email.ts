@@ -285,7 +285,7 @@ export async function sendAdminReplyToCustomer(params: {
         <strong>${escapeHtml(adminName)}</strong><br>
         Peeyem Traders — Industrial Conveyor &amp; Rubber Solutions<br>
         Phone: <a href="tel:${COMPANY_INFO.phoneRaw}" style="color: #0284c7; text-decoration: none;">${COMPANY_INFO.phone}</a> | 
-        WhatsApp: <a href="https://wa.me/${COMPANY_INFO.phoneRaw.replace(/[^0-9]/g, "")}" style="color: #10b981; text-decoration: none;">+91 93633 10787</a><br>
+        WhatsApp: <a href="https://wa.me/${COMPANY_INFO.phoneRaw.replace(/[^0-9]/g, "")}" style="color: #10b981; text-decoration: none;">${COMPANY_INFO.phone}</a><br>
         Email: <a href="mailto:${COMPANY_INFO.email}" style="color: #0284c7;">${COMPANY_INFO.email}</a><br>
         16, M.M.A. Market, South Ukkadam, Coimbatore, Tamil Nadu – 641001
       </div>

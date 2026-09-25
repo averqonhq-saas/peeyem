@@ -159,7 +159,7 @@ export default function ProductCarousel() {
                   <span>Send Enquiry</span>
                 </button>
                 <a
-                  href={`https://wa.me/919363310787?text=${encodeURIComponent(selectedProduct.whatsappMessage)}`}
+                  href={`https://wa.me/916379485898?text=${encodeURIComponent(selectedProduct.whatsappMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm transition-all flex items-center gap-2 active:scale-95"

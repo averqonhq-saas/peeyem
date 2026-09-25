@@ -333,7 +333,7 @@ export default function ContactRFQSection() {
                           id="phone"
                           name="phone"
                           pattern="[0-9]{10}"
-                          placeholder="93633 10787"
+                          placeholder="63794 85898"
                           required
                           type="tel"
                           value={formData.phone}
