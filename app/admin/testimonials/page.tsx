@@ -204,7 +204,24 @@ function TestimonialsContent() {
       {loading ? (
         <div className="p-12 text-center text-slate-500 text-sm">Synchronizing reviews...</div>
       ) : testimonials.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 text-sm">No testimonials added yet.</div>
+        <div className="p-12 text-center rounded-2xl bg-[#0e1720] border border-slate-800 flex flex-col items-center justify-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400">
+            <span className="material-symbols-outlined text-2xl">rate_review</span>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-white">No Testimonials Added</h3>
+            <p className="text-xs text-slate-400 max-w-sm">
+              All test data has been removed. Click &ldquo;Add YouTube Video Feedback&rdquo; above to publish verified customer reviews.
+            </p>
+          </div>
+          <button
+            onClick={openAddModal}
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ff8d28] hover:bg-[#e66c00] text-slate-950 font-bold text-xs transition-colors"
+          >
+            <span className="material-symbols-outlined text-base">video_call</span>
+            <span>Add Real Client Review</span>
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {testimonials.map((item) => (

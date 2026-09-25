@@ -49,59 +49,7 @@ const INITIAL_PRODUCTS: DbProduct[] = PRODUCTS.map((p, idx) => ({
   updated_at: new Date(Date.now() - (idx + 1) * 86400000).toISOString(),
 }));
 
-const INITIAL_TESTIMONIALS: DbTestimonial[] = [
-  {
-    id: "test-1",
-    customer_name: "Rajesh Kumar",
-    company: "Premier Quarry Works",
-    designation: "Operations Head",
-    profile_image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    testimonial: "Peeyem Traders supplied 450 meters of M-24 grade conveyor belting for our granite crushing line. Zero downtime over 18 months under harsh quarry loads.",
-    youtube_url: "https://www.youtube.com/watch?v=W1YV5piOBmw",
-    youtube_video_id: "W1YV5piOBmw",
-    embed_url: "https://www.youtube.com/embed/W1YV5piOBmw?rel=0",
-    thumbnail_url: "https://img.youtube.com/vi/W1YV5piOBmw/hqdefault.jpg",
-    is_active: true,
-    display_order: 1,
-    created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-  },
-  {
-    id: "test-2",
-    customer_name: "M. Soundararajan",
-    company: "Kovai Cement Depot",
-    designation: "Chief Engineer",
-    profile_image_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    testimonial: "Fast turnaround and precise vulcanized hot jointing on site. The team delivered emergency chevron belting within 6 hours of our call.",
-    youtube_url: "https://www.youtube.com/watch?v=yPYZpwSpKmA",
-    youtube_video_id: "yPYZpwSpKmA",
-    embed_url: "https://www.youtube.com/embed/yPYZpwSpKmA?rel=0",
-    thumbnail_url: "https://img.youtube.com/vi/yPYZpwSpKmA/hqdefault.jpg",
-    is_active: true,
-    display_order: 2,
-    created_at: new Date(Date.now() - 15 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 15 * 86400000).toISOString(),
-  },
-  {
-    id: "test-3",
-    customer_name: "Venkatesh Babu",
-    company: "Apex Agrotech Mills",
-    designation: "Plant Manager",
-    profile_image_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    testimonial: "Outstanding quality food-grade PVC and oil resistant rubber sheeting. Consistent thickness and superior chemical resilience across our processing lines.",
-    youtube_url: "https://www.youtube.com/watch?v=8lmBMYr8H6g",
-    youtube_video_id: "8lmBMYr8H6g",
-    embed_url: "https://www.youtube.com/embed/8lmBMYr8H6g?rel=0",
-    thumbnail_url: "https://img.youtube.com/vi/8lmBMYr8H6g/hqdefault.jpg",
-    is_active: true,
-    display_order: 3,
-    created_at: new Date(Date.now() - 7 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 7 * 86400000).toISOString(),
-  },
-];
+const INITIAL_TESTIMONIALS: DbTestimonial[] = [];
 
 const INITIAL_VIDEOS: DbPromotionVideo[] = [
   {
@@ -634,29 +582,21 @@ export const dbService = {
         const snap = await getDocs(collection(firestoreDb, "testimonials"));
         if (!snap.empty) {
           const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbTestimonial));
-          return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        } else {
-          for (const t of INITIAL_TESTIMONIALS) {
-            await setDoc(doc(firestoreDb, "testimonials", t.id), t, { merge: true });
-          }
-          return INITIAL_TESTIMONIALS;
+          return list
+            .filter((t) => !["test-1", "test-2", "test-3"].includes(t.id))
+            .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
         }
       } catch (e) {
         console.warn("Firestore testimonials error:", e);
       }
     }
     const local = getLocal<DbTestimonial[]>("testimonials", INITIAL_TESTIMONIALS);
-    const enriched = local.map((t) => {
-      // Migrate legacy Rickroll dummy or empty youtube link to real industry video
-      if (!t.youtube_url || t.youtube_video_id === "dQw4w9WgXcQ" || t.youtube_url?.includes("dQw4w9WgXcQ")) {
-        const init = INITIAL_TESTIMONIALS.find((it) => it.id === t.id);
-        if (init?.youtube_url) {
-          return { ...t, ...init };
-        }
-      }
-      return t;
-    });
-    return [...enriched].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    const cleaned = local.filter((t) => !["test-1", "test-2", "test-3"].includes(t.id));
+    if (cleaned.length !== local.length) {
+      setLocal("testimonials", cleaned);
+      broadcastSync("testimonials");
+    }
+    return [...cleaned].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   },
 
   async addTestimonial(data: Omit<DbTestimonial, "id" | "created_at" | "updated_at">): Promise<DbTestimonial> {
