@@ -7,70 +7,92 @@ interface ProductsHeroProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onFilterClick: () => void;
+  onSendEnquiry?: () => void;
 }
 
 export default function ProductsHero({
   searchQuery,
   onSearchChange,
   onFilterClick,
+  onSendEnquiry,
 }: ProductsHeroProps) {
   return (
     <>
       {/* Top Technical Breadcrumb & Meta Bar */}
-      <section className="w-full bg-surface-container-low border-b border-outline-variant/30">
-        <div className="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-on-surface-variant font-medium">
-            <Link className="hover:text-primary transition-colors flex items-center gap-1" href="/">
+      <section className="w-full bg-slate-50 border-b border-slate-200">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-slate-500 font-medium">
+            <Link className="hover:text-amber-600 transition-colors flex items-center gap-1" href="/">
               <span className="material-symbols-outlined text-sm">home</span>
               <span>Home</span>
             </Link>
-            <span className="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-            <span className="text-primary font-bold">Products Catalog</span>
-            <span className="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-            <span className="text-on-surface">Coimbatore Central Depot</span>
+            <span className="material-symbols-outlined text-[14px] text-slate-300">chevron_right</span>
+            <span className="text-amber-600 font-bold">Products Catalog</span>
+            <span className="material-symbols-outlined text-[14px] text-slate-300">chevron_right</span>
+            <span className="text-slate-900 font-semibold">Coimbatore Central Depot</span>
           </nav>
 
-          <div className="flex items-center gap-4 text-on-surface-variant text-[11px] font-mono">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 font-semibold border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div className="flex items-center gap-4 text-slate-500 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Live Stock Depot: South Ukkadam
             </span>
-            <span className="hidden md:inline text-outline-variant">|</span>
-            <span className="hidden md:inline font-medium">IS 1891 (Part 1) &amp; DIN 22102 Compliant</span>
+            <span className="hidden md:inline text-slate-300">|</span>
+            <span className="hidden md:inline font-medium">IS 1891 Tested &bull; High Tensile EP Fabric</span>
           </div>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="w-full bg-surface py-space-xl relative overflow-hidden">
-        {/* Subtle radial engineering glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-2xl pointer-events-none"></div>
+      <section className="w-full bg-white py-12 sm:py-16 relative overflow-hidden border-b border-slate-200">
+        {/* Subtle ambient glow */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin relative z-10">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
             {/* Hero Left Content */}
-            <div className="lg:col-span-7 flex flex-col gap-5 animate-fade-in-up">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 w-fit text-xs font-bold tracking-wider uppercase">
-                <span className="material-symbols-outlined text-base">precision_manufacturing</span>
-                <span>Industrial Material Handling Solutions</span>
+            <div className="lg:col-span-7 flex flex-col gap-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200 w-fit text-xs font-bold tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                Industrial Belts for Every Application
               </div>
 
-              <h1 className="font-headline-lg text-3xl sm:text-4xl lg:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
-                Engineered Conveyor Belting &amp; Wear Solutions
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                Industrial Belts Built for Demanding Applications
               </h1>
 
-              <p className="font-body-md text-base text-on-surface-variant max-w-2xl leading-relaxed">
-                Heavy-duty multi-ply fabric belts (NN/EP), steep-incline chevron profiles, abrasion-resistant rubber sheeting, and vulcanizing fasteners stocked for immediate dispatch from Coimbatore.
+              <p className="text-slate-600 text-base leading-relaxed max-w-2xl">
+                We supply high-quality industrial belts and rubber products for a wide range of industrial and material-handling applications.
               </p>
 
-              {/* Interactive Search & Filter Bar */}
-              <div className="mt-2 flex flex-col sm:flex-row items-stretch gap-2 bg-surface-container-lowest p-2 rounded-2xl shadow-md border border-outline-variant/30 hover:border-primary/40 transition-colors">
-                <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 bg-surface-container-low rounded-xl">
-                  <span className="material-symbols-outlined text-outline text-xl">search</span>
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={onFilterClick}
+                  className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-sm flex items-center gap-2"
+                >
+                  <span>Explore Products</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_downward</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={onSendEnquiry}
+                  className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-all shadow-sm flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[18px]">send</span>
+                  <span>Send Enquiry</span>
+                </button>
+              </div>
+
+              {/* Search & Filter Bar */}
+              <div className="mt-3 flex flex-col sm:flex-row items-stretch gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200">
+                <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 bg-white rounded-xl border border-slate-200">
+                  <span className="material-symbols-outlined text-slate-400 text-xl">search</span>
                   <input
-                    className="w-full bg-transparent font-body-md text-sm text-on-surface placeholder:text-outline focus:outline-none"
-                    placeholder="Search product name, ply rating (NN/EP), or grade (M-24, HR)..."
+                    className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    placeholder="Search Rubber Conveyor, PU, PVC, V-Belt, Cow Mat, Sheets, Tarpaulin, Mud Flaps..."
                     type="text"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
@@ -86,83 +108,75 @@ export default function ProductsHero({
                     </button>
                   )}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={onFilterClick}
-                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-base">tune</span>
-                  <span>Filter Catalog</span>
-                </button>
               </div>
 
               {/* Highlights Metric Strip */}
               <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 hover-lift">
-                  <span className="font-headline-sm text-xl font-bold text-primary block">1600 mm</span>
-                  <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">Max Cut Width</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
+                  <span className="text-xl font-black text-slate-900 block">8 Series</span>
+                  <span className="text-[11px] text-slate-500 uppercase font-bold">Standard Catalog</span>
                 </div>
-                <div className="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 hover-lift">
-                  <span className="font-headline-sm text-xl font-bold text-secondary block">EP / NN</span>
-                  <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">Tensile Modulus</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
+                  <span className="text-xl font-black text-amber-600 block">M24 &amp; SHR</span>
+                  <span className="text-[11px] text-slate-500 uppercase font-bold">Quarry &amp; Heat Rated</span>
                 </div>
-                <div className="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/20 hover-lift">
-                  <span className="font-headline-sm text-xl font-bold text-amber-600 block">24 Hours</span>
-                  <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">Depot Dispatch</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
+                  <span className="text-xl font-black text-slate-900 block">Same-Day</span>
+                  <span className="text-[11px] text-slate-500 uppercase font-bold">Depot Dispatch</span>
                 </div>
               </div>
             </div>
 
-            {/* Hero Right Visual: Engineering Spotlight Card */}
-            <div className="lg:col-span-5 animate-fade-in-up delay-150">
-              <div className="relative rounded-3xl overflow-hidden bg-surface-container-lowest shadow-xl border border-outline-variant/30 group hover-lift">
-                <div className="relative h-80 sm:h-96 w-full overflow-hidden bg-surface-dim">
+            {/* Hero Right Visual */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl border border-slate-200 group">
+                <div className="relative h-80 sm:h-96 w-full overflow-hidden bg-slate-100">
                   <Image
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9rZd_mnTr1CTvZzvMWgYHLE-fO1KLDn09VkqIpMT7bB2Aq84j2fJIBWl9laruoBVrr2U0OSIZVip_nG_aqmktotIPeTa2_gpc6gKMIeN1NB1-RIR9bpth9qRPOSjwN631vQI_AQm7FbVdcTGhr144nwPrVYAgEgdCgfC5IHR0HI0XGQ14Zj38hzyqvkvIuhxPcVDenMUlbyymmH_ifNDyox6aM1nrcueDlKVNjtxm"
-                    alt="Heavy-Duty Chevron Conveyor Belt Roll"
+                    src="/images/products/rubber-conveyor-belt.jpg"
+                    alt="Heavy-Duty Rubber Conveyor Belt Roll"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     sizes="(max-width: 1024px) 100vw, 520px"
                     priority
                   />
-                  <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold border border-white/20 shadow-lg">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-semibold border border-white/20 shadow-lg">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Direct Factory Ready Stock</span>
                   </div>
 
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-5 text-white">
-                    <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-[#ff8d28] text-slate-950 inline-block mb-1">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent p-5 text-white">
+                    <span className="px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider bg-amber-500 text-slate-950 inline-block mb-1">
                       Featured Specification
                     </span>
-                    <h2 className="font-headline-sm text-lg font-bold text-white leading-snug">
-                      Chevron Cleated High-Angle Belting
+                    <h2 className="text-lg font-black text-white leading-snug">
+                      Rubber Conveyor Belt (M24 / N17 / SHR / HR)
                     </h2>
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-200 font-mono">
-                      <span>Width: 400mm – 1600mm</span>
-                      <span>•</span>
-                      <span>Cleat: 15mm / 25mm / 32mm</span>
-                      <span>•</span>
-                      <span>Angle: Up to 40°</span>
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-300 font-mono">
+                      <span>Width: 300mm – 1600mm</span>
+                      <span>&bull;</span>
+                      <span>High Tensile EP Fabric</span>
+                      <span>&bull;</span>
+                      <span>Quarry Tested</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-surface-container-low flex items-center justify-between border-t border-outline-variant/30">
-                  <div className="flex items-center gap-2 text-on-surface text-xs font-medium">
-                    <span className="material-symbols-outlined text-secondary text-base">verified</span>
-                    <span>Pre-tested for tensile load &amp; cleat adhesion</span>
+                <div className="p-4 bg-slate-50 flex items-center justify-between border-t border-slate-200">
+                  <div className="flex items-center gap-2 text-slate-700 text-xs font-medium">
+                    <span className="material-symbols-outlined text-amber-600 text-base">verified</span>
+                    <span>Pre-tested for tensile load &amp; cover adhesion</span>
                   </div>
                   <button
                     type="button"
                     onClick={onFilterClick}
-                    className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-colors cursor-pointer shadow-sm"
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors shadow-sm"
                   >
                     Browse Catalog
                   </button>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
