@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { COMPANY_INFO } from "@/data/products";
 
 const quickLinks = [
@@ -28,9 +29,15 @@ export default function Footer() {
 
           {/* ── Column 1: Brand & Overview ── */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-[15px] font-black uppercase tracking-tight text-[#1b365d]">
-              PEEYEM TRADERS
-            </h3>
+            <Link href="/" className="inline-block relative h-12 w-48 mb-1">
+              <Image
+                src={COMPANY_INFO.logoUrl}
+                alt="Peeyem Traders Logo"
+                fill
+                className="object-contain object-left"
+                sizes="192px"
+              />
+            </Link>
             <p className="text-[13px] text-slate-600 leading-relaxed max-w-xs">
               Peeyem Traders - Industrial Conveyor Belts, Rubber Sheets, Specialized Belts, Conveyor Accessories and Material-Handling Products.
             </p>

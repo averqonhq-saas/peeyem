@@ -47,6 +47,13 @@ export const metadata: Metadata = {
     locale: "en_IN",
     siteName: "Peeyem Traders",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({

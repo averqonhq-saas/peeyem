@@ -185,5 +185,5 @@ export const COMPANY_INFO = {
   phoneRaw: "+916379485898",
   email: "peeyemtraders16@gmail.com",
   mapsUrl: "https://maps.google.com/?q=Peeyem+Traders+South+Ukkadam+Coimbatore",
-  logoUrl: "/logo.svg",
+  logoUrl: "/logo.png",
 };

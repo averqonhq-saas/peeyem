@@ -61,24 +61,16 @@ export default function Header() {
           <div className="flex items-center justify-between h-[68px]">
 
             {/* ── Brand Logo ── */}
-            <Link href="/" className="flex items-center gap-3 group focus-visible:outline-none flex-shrink-0">
-              <div className="relative h-10 w-11 overflow-hidden rounded-lg shadow-sm ring-1 ring-blue-100 transition-shadow group-hover:shadow-md">
+            <Link href="/" className="flex items-center group focus-visible:outline-none flex-shrink-0">
+              <div className="relative h-12 w-48 sm:w-56 transition-transform duration-200 group-hover:scale-[1.02]">
                 <Image
                   src={COMPANY_INFO.logoUrl}
                   alt="Peeyem Traders Logo"
                   fill
-                  className="object-contain p-0.5"
+                  className="object-contain object-left"
                   priority
-                  sizes="44px"
+                  sizes="(max-width: 640px) 192px, 224px"
                 />
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-[17px] font-black text-blue-700 tracking-tight">
-                  PEEYEM
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                  Traders
-                </span>
               </div>
             </Link>
 
@@ -175,19 +167,15 @@ export default function Header() {
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
-          <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-            <div className="relative h-9 w-10 rounded-lg overflow-hidden ring-1 ring-blue-100">
+          <Link href="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
+            <div className="relative h-10 w-44">
               <Image
                 src={COMPANY_INFO.logoUrl}
-                alt="Peeyem Traders"
+                alt="Peeyem Traders Logo"
                 fill
-                className="object-contain p-0.5"
-                sizes="40px"
+                className="object-contain object-left"
+                sizes="176px"
               />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-[16px] font-black text-blue-700 tracking-tight">PEEYEM</span>
-              <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-400">Traders</span>
             </div>
           </Link>
           <button
