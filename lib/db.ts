@@ -22,6 +22,7 @@ import {
   AdminMediaAsset,
   DbGalleryImage,
   EnquiryStatus,
+  EnquiryMessage,
 } from "@/types/admin";
 import { PRODUCTS } from "@/data/products";
 import { parseYouTubeUrl } from "./youtube";
@@ -757,13 +758,44 @@ export const dbService = {
     return [...cleaned].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   },
 
-  async addEnquiry(data: Omit<DbEnquiry, "id" | "created_at" | "updated_at" | "status"> & { status?: EnquiryStatus }): Promise<DbEnquiry> {
+  async getEnquiryById(id: string): Promise<DbEnquiry | null> {
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const snap = await getDoc(doc(firestoreDb, "enquiries", id));
+        if (snap.exists()) {
+          return { id: snap.id, ...snap.data() } as DbEnquiry;
+        }
+      } catch (e) {
+        console.warn("Firestore getEnquiryById error:", e);
+      }
+    }
+    const enquiries = await this.getEnquiries();
+    return enquiries.find((e) => e.id === id) || null;
+  },
+
+  async addEnquiry(
+    data: Omit<DbEnquiry, "id" | "created_at" | "updated_at" | "status"> & { id?: string; status?: EnquiryStatus }
+  ): Promise<DbEnquiry> {
     const now = new Date().toISOString();
-    const id = "enq-" + Date.now();
+    const id = data.id || "PYM-" + Math.floor(100000 + Math.random() * 900000);
+
+    const initialMessage: EnquiryMessage = {
+      id: "msg-" + Date.now(),
+      enquiry_id: id,
+      sender: "CUSTOMER",
+      sender_name: data.name,
+      sender_email: data.email,
+      message: data.message,
+      timestamp: now,
+      delivery_status: "DELIVERED",
+    };
+
     const item: DbEnquiry = {
       ...data,
-      status: data.status || "NEW",
       id,
+      status: data.status || "NEW",
+      conversation: data.conversation && data.conversation.length > 0 ? data.conversation : [initialMessage],
+      unread_by_admin: true,
       created_at: now,
       updated_at: now,
     };
@@ -777,9 +809,71 @@ export const dbService = {
     }
 
     const current = getLocal<DbEnquiry[]>("enquiries", INITIAL_ENQUIRIES);
-    setLocal("enquiries", [item, ...current]);
+    const existingIndex = current.findIndex((e) => e.id === id);
+    let nextList: DbEnquiry[];
+    if (existingIndex >= 0) {
+      nextList = [...current];
+      nextList[existingIndex] = item;
+    } else {
+      nextList = [item, ...current];
+    }
+
+    setLocal("enquiries", nextList);
     broadcastSync("enquiries");
     return item;
+  },
+
+  async addEnquiryMessage(
+    enquiryId: string,
+    message: Omit<EnquiryMessage, "id" | "timestamp" | "enquiry_id">,
+    newStatus?: EnquiryStatus
+  ): Promise<EnquiryMessage> {
+    const now = new Date().toISOString();
+    const messageId = "msg-" + Date.now();
+    const fullMessage: EnquiryMessage = {
+      ...message,
+      id: messageId,
+      enquiry_id: enquiryId,
+      timestamp: now,
+    };
+
+    const current = await this.getEnquiries();
+    const enquiry = current.find((e) => e.id === enquiryId);
+    if (!enquiry) {
+      throw new Error(`Enquiry ${enquiryId} not found`);
+    }
+
+    const updatedConversation = [...(enquiry.conversation || []), fullMessage];
+    const updates: Partial<DbEnquiry> = {
+      conversation: updatedConversation,
+      updated_at: now,
+      last_reply_at: now,
+    };
+    if (newStatus) {
+      updates.status = newStatus;
+    }
+    if (message.sender === "CUSTOMER") {
+      updates.unread_by_admin = true;
+    }
+
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        await setDoc(doc(firestoreDb, "enquiries", enquiryId), updates, { merge: true });
+      } catch (e) {
+        console.warn("Firestore addEnquiryMessage error:", e);
+      }
+    }
+
+    const next = current.map((e) => {
+      if (e.id === enquiryId) {
+        return { ...e, ...updates };
+      }
+      return e;
+    });
+    setLocal("enquiries", next);
+    broadcastSync("enquiries");
+
+    return fullMessage;
   },
 
   async updateEnquiryStatus(id: string, status: EnquiryStatus, notes?: string): Promise<DbEnquiry> {

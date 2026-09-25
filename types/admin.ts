@@ -56,7 +56,21 @@ export interface DbPromotionVideo {
   updated_at: string;
 }
 
-export type EnquiryStatus = "NEW" | "CONTACTED" | "CLOSED";
+export type EnquiryStatus = "NEW" | "CONTACTED" | "IN_PROGRESS" | "CONVERTED" | "CLOSED";
+
+export interface EnquiryMessage {
+  id: string;
+  enquiry_id: string;
+  sender: "CUSTOMER" | "ADMIN";
+  sender_name: string;
+  sender_email: string;
+  message: string;
+  is_internal?: boolean; // True for internal staff notes
+  timestamp: string;
+  delivery_status?: "PENDING" | "SENT" | "FAILED" | "DELIVERED";
+  email_message_id?: string;
+  error_message?: string;
+}
 
 export interface DbEnquiry {
   id: string;
@@ -67,10 +81,15 @@ export interface DbEnquiry {
   product_id?: string;
   subject?: string;
   message: string;
+  source?: string; // e.g. "Home Page Contact", "Contact Page RFQ", "Product Catalog Modal"
   status: EnquiryStatus;
   created_at: string;
   updated_at: string;
   notes?: string;
+  conversation?: EnquiryMessage[];
+  last_reply_at?: string;
+  unread_by_admin?: boolean;
+  email_delivery_status?: "SENT" | "FAILED" | "PENDING";
 }
 
 export interface DbGalleryImage {

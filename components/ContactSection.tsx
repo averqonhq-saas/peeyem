@@ -16,13 +16,41 @@ export default function ContactSection() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submittedEnquiryId, setSubmittedEnquiryId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
     try {
-      await dbService.addEnquiry({
+      const res = await fetch("/api/enquiries/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          company: formData.company,
+          subject: formData.category ? `Quote: ${formData.category}` : "Technical Inquiry",
+          message: formData.message,
+          source: "Homepage Contact Section",
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.enquiry) {
+        setSubmittedEnquiryId(data.enquiryId);
+        // Also save to client dbService for instant local-sync preview
+        await dbService.addEnquiry(data.enquiry);
+        setSubmitted(true);
+      } else {
+        setErrorMessage(data.error || "Failed to submit enquiry.");
+      }
+    } catch (err) {
+      console.error("Enquiry submission error:", err);
+      // Fallback to client dbService
+      const saved = await dbService.addEnquiry({
         name: formData.name || "Customer",
         phone: formData.phone || "Not provided",
         email: formData.email,
@@ -30,10 +58,9 @@ export default function ContactSection() {
         product_id: formData.category || "General Inquiries",
         subject: formData.category ? `Quote: ${formData.category}` : "Technical Inquiry",
         message: formData.message || "Request for quotation submitted via homepage contact form.",
+        source: "Homepage Contact Section",
       });
-      setSubmitted(true);
-    } catch (err) {
-      console.error("Enquiry submission error:", err);
+      setSubmittedEnquiryId(saved.id);
       setSubmitted(true);
     } finally {
       setIsSubmitting(false);
@@ -127,19 +154,25 @@ export default function ContactSection() {
           <div className="lg:col-span-7 rounded-2xl bg-surface-container-lowest p-5 sm:p-8 lg:p-10 shadow-md border border-outline-variant/30">
             {submitted ? (
               <div className="flex flex-col items-center justify-center text-center p-8 gap-4">
-                <div className="w-16 h-16 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
                   <span className="material-symbols-outlined text-[36px]">check_circle</span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface">
                   Thank You for Your Inquiry!
                 </h3>
+                {submittedEnquiryId && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-mono font-bold border border-emerald-200">
+                    <span>Enquiry Reference: {submittedEnquiryId}</span>
+                  </div>
+                )}
                 <p className="font-body-md text-on-surface-variant max-w-md">
-                  We have received your quotation request for <strong>{formData.category || "Industrial Belting"}</strong>. Peeyem Traders technical sales desk will reach out within 2 business hours.
+                  We have received your quotation request for <strong>{formData.category || "Industrial Belting"}</strong>. A confirmation email has been sent to <strong>{formData.email}</strong>. Our technical desk will reach out within 2 business hours.
                 </p>
                 <button
                   type="button"
                   onClick={() => {
                     setSubmitted(false);
+                    setSubmittedEnquiryId("");
                     setFormData({ name: "", company: "", phone: "", email: "", category: "", message: "" });
                   }}
                   className="mt-2 px-6 py-2.5 rounded-lg bg-primary text-on-primary font-label-md"
@@ -155,6 +188,12 @@ export default function ContactSection() {
                 <p className="font-body-sm text-on-surface-variant -mt-2">
                   Provide belt rating, dimensions, or rubber sheet type.
                 </p>
+
+                {errorMessage && (
+                  <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div className="flex flex-col gap-1.5">

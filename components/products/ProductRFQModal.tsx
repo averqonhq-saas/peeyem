@@ -19,6 +19,7 @@ export default function ProductRFQModal({
     length: "",
     material: "",
     phone: "",
+    email: "",
     specs: "",
   });
 
@@ -31,26 +32,43 @@ export default function ProductRFQModal({
     e.preventDefault();
     setSubmitting(true);
     try {
+      const res = await fetch("/api/enquiries/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `Customer (${formData.phone})`,
+          phone: formData.phone,
+          email: formData.email || "inquiry@peeyemtraders.com",
+          subject: `Product RFQ: ${productName || "Conveyor Solution"}`,
+          message: `Width: ${formData.width || "N/A"}, Length: ${formData.length || "N/A"}, Material: ${formData.material || "N/A"}. Specific Notes: ${formData.specs || "None"}`,
+          source: "Product Catalog Quick RFQ Modal",
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.enquiry) {
+        await dbService.addEnquiry(data.enquiry);
+      }
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 1500);
+    } catch (err) {
+      console.error("RFQ modal submit error:", err);
       await dbService.addEnquiry({
-        name: `Catalog Customer (${formData.phone})`,
+        name: `Customer (${formData.phone})`,
         phone: formData.phone || "Not provided",
-        email: "quote-request@peeyemtraders.com",
+        email: formData.email || "inquiry@peeyemtraders.com",
         product_id: productName || "Conveyor Solution",
-        subject: `Catalog RFQ: ${productName || "Product"}`,
-        message: `Width: ${formData.width || "N/A"}, Length: ${formData.length || "N/A"}, Material: ${formData.material || "N/A"}. Additional notes: ${formData.specs || "None"}`,
+        subject: `Product RFQ: ${productName || "Product"}`,
+        message: `Width: ${formData.width || "N/A"}, Length: ${formData.length || "N/A"}, Material: ${formData.material || "N/A"}. Notes: ${formData.specs || "None"}`,
+        source: "Product Catalog Quick RFQ Modal",
       });
       setSubmitted(true);
       setTimeout(() => {
         setSubmitted(false);
         onClose();
-      }, 1000);
-    } catch (err) {
-      console.error("RFQ modal submit error:", err);
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        onClose();
-      }, 1000);
+      }, 1500);
     } finally {
       setSubmitting(false);
     }
@@ -134,6 +152,18 @@ export default function ProductRFQModal({
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="font-label-sm text-label-sm text-on-surface-variant">
+                Email Address (For Quote PDF &amp; Pricing)
+              </label>
+              <input
+                className="w-full mt-1 p-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container border border-outline-variant/20"
+                placeholder="name@company.com"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
           </div>

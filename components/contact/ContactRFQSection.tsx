@@ -17,6 +17,8 @@ export default function ContactRFQSection() {
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedEnquiryId, setSubmittedEnquiryId] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -27,8 +29,32 @@ export default function ContactRFQSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
     try {
-      await dbService.addEnquiry({
+      const res = await fetch("/api/enquiries/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+          company: formData.companyName,
+          subject: `Technical RFQ: ${formData.productCategory || "Custom Specs"}`,
+          message: `${formData.specifications}${attachedFileName ? ` (Attached spec sheet: ${attachedFileName})` : ""}`,
+          source: "Contact Page Technical RFQ Portal",
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.enquiry) {
+        setSubmittedEnquiryId(data.enquiryId);
+        await dbService.addEnquiry(data.enquiry);
+        setIsSubmitted(true);
+      } else {
+        setErrorMessage(data.error || "Failed to submit RFQ.");
+      }
+    } catch (err) {
+      console.error("RFQ submission error:", err);
+      const saved = await dbService.addEnquiry({
         name: formData.fullName || "Customer",
         phone: formData.phone || "Not provided",
         email: formData.email,
@@ -36,10 +62,9 @@ export default function ContactRFQSection() {
         product_id: formData.productCategory || "RFQ Schedule",
         subject: `Technical RFQ: ${formData.productCategory || "Custom Specs"}`,
         message: `${formData.specifications}${attachedFileName ? ` (Attached spec sheet: ${attachedFileName})` : ""}`,
+        source: "Contact Page Technical RFQ Portal",
       });
-      setIsSubmitted(true);
-    } catch (err) {
-      console.error("RFQ submission error:", err);
+      setSubmittedEnquiryId(saved.id);
       setIsSubmitted(true);
     } finally {
       setIsSubmitting(false);
@@ -47,6 +72,8 @@ export default function ContactRFQSection() {
   };
 
   const handleReset = () => {
+    setSubmittedEnquiryId("");
+    setErrorMessage("");
     setFormData({
       fullName: "",
       companyName: "",
@@ -225,14 +252,19 @@ export default function ContactRFQSection() {
               {isSubmitted ? (
                 /* Success State Feedback */
                 <div className="flex flex-col items-center justify-center p-space-xl text-center bg-surface-container rounded-xl gap-4">
-                  <div className="w-16 h-16 rounded-full bg-secondary text-on-secondary flex items-center justify-center mb-space-xs shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-space-xs shadow-lg">
                     <span className="material-symbols-outlined text-[36px]">check_circle</span>
                   </div>
                   <h3 className="font-headline-md text-headline-md text-on-surface font-bold">
                     Thank You!
                   </h3>
+                  {submittedEnquiryId && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-mono font-bold border border-emerald-200">
+                      <span>Enquiry Reference: {submittedEnquiryId}</span>
+                    </div>
+                  )}
                   <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-                    Your technical enquiry for <strong>{formData.productCategory || "Industrial Belting"}</strong> has been registered in our Coimbatore central dispatch queue. Our sales engineering team will review the parameters and contact you within 2 business hours.
+                    Your technical enquiry for <strong>{formData.productCategory || "Industrial Belting"}</strong> has been registered in our Coimbatore central dispatch queue. A confirmation email has been dispatched to <strong>{formData.email}</strong>. Our sales engineering team will review the parameters and contact you within 2 business hours.
                   </p>
                   <div className="mt-space-md flex gap-space-sm">
                     <button
@@ -247,6 +279,11 @@ export default function ContactRFQSection() {
               ) : (
                 /* Form */
                 <form className="flex flex-col gap-space-md" onSubmit={handleSubmit}>
+                  {errorMessage && (
+                    <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+                      {errorMessage}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
                     {/* Full Name */}
                     <div className="flex flex-col gap-1.5">

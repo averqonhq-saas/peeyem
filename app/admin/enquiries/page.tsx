@@ -1,34 +1,40 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { dbService } from "@/lib/db";
-import { DbEnquiry, EnquiryStatus } from "@/types/admin";
+import { DbEnquiry, EnquiryMessage, EnquiryStatus } from "@/types/admin";
 
 function EnquiriesContent() {
   const searchParams = useSearchParams();
   const [enquiries, setEnquiries] = useState<DbEnquiry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [dateFilter, setDateFilter] = useState<string>("ALL");
 
+  // Active Enquiry & Conversation
   const [selectedEnquiry, setSelectedEnquiry] = useState<DbEnquiry | null>(null);
-  const [notesInput, setNotesInput] = useState("");
-  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [composerMode, setComposerMode] = useState<"REPLY" | "NOTE">("REPLY");
+  const [replyText, setReplyText] = useState("");
+  const [composerStatus, setComposerStatus] = useState<EnquiryStatus | "KEEP">("KEEP");
+  const [sendingReply, setSendingReply] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(""), 3000);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const showToast = (text: string, type: "success" | "error" = "success") => {
+    setToastMessage({ text, type });
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   useEffect(() => {
-    // Real-Time subscription for enquiries (subscribes once on mount)
     const unsubscribe = dbService.subscribeEnquiries((list) => {
       setEnquiries(list);
       setLoading(false);
-      // Keep selected enquiry in sync if open using functional state updater
       setSelectedEnquiry((prev) => {
         if (!prev) return null;
         const fresh = list.find((e) => e.id === prev.id);
@@ -51,498 +57,844 @@ function EnquiriesContent() {
     if (id && enquiries.length > 0) {
       const found = enquiries.find((e) => e.id === id);
       if (found) {
-        setSelectedEnquiry((prev) => {
-          if (prev?.id === id) return prev;
-          setNotesInput(found.notes || "");
-          return found;
-        });
+        setSelectedEnquiry(found);
       }
     }
   }, [searchParams, enquiries]);
 
-  const openEnquiryDrawer = (enquiry: DbEnquiry) => {
-    setSelectedEnquiry(enquiry);
-    setNotesInput(enquiry.notes || "");
-  };
+  // Scroll to bottom of conversation timeline when selected enquiry changes or replies added
+  useEffect(() => {
+    if (selectedEnquiry) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedEnquiry?.conversation?.length, selectedEnquiry?.id]);
 
+  // Status Change
   const handleStatusChange = async (newStatus: EnquiryStatus) => {
     if (!selectedEnquiry) return;
-    setUpdatingStatus(true);
     try {
-      const updated = await dbService.updateEnquiryStatus(
-        selectedEnquiry.id,
-        newStatus,
-        notesInput
-      );
+      const updated = await dbService.updateEnquiryStatus(selectedEnquiry.id, newStatus);
       setSelectedEnquiry(updated);
       showToast(`Status updated to ${newStatus}`);
     } catch (err) {
       console.error("Error updating status:", err);
-    } finally {
-      setUpdatingStatus(false);
+      showToast("Failed to update status", "error");
     }
   };
 
-  const handleSaveNotes = async () => {
-    if (!selectedEnquiry) return;
-    setUpdatingStatus(true);
+  // Submit Reply or Internal Note
+  const handleSendReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEnquiry || !replyText.trim()) return;
+
+    setSendingReply(true);
+    const isInternal = composerMode === "NOTE";
+    const textToSend = replyText.trim();
+    const nextStatus = composerStatus !== "KEEP" ? composerStatus : undefined;
+
     try {
-      const updated = await dbService.updateEnquiryStatus(
+      const res = await fetch("/api/enquiries/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enquiryId: selectedEnquiry.id,
+          replyMessage: textToSend,
+          isInternal,
+          newStatus: nextStatus,
+          adminName: "Peeyem Traders Operations",
+          customerName: selectedEnquiry.name,
+          customerEmail: selectedEnquiry.email,
+          customerPhone: selectedEnquiry.phone,
+          subject: selectedEnquiry.subject,
+          originalMessage: selectedEnquiry.message,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.newMessage) {
+        // Optimistically record to local service
+        await dbService.addEnquiryMessage(
+          selectedEnquiry.id,
+          {
+            sender: "ADMIN",
+            sender_name: "Peeyem Traders Operations",
+            sender_email: "peeyemtraders16@gmail.com",
+            message: textToSend,
+            is_internal: isInternal,
+            delivery_status: data.emailSent ? "SENT" : isInternal ? undefined : "FAILED",
+            email_message_id: data.newMessage.email_message_id,
+            error_message: data.error,
+          },
+          nextStatus
+        );
+
+        setReplyText("");
+        setComposerStatus("KEEP");
+        showToast(
+          isInternal
+            ? "Internal staff note saved."
+            : data.emailSent
+            ? "Reply sent to customer's email!"
+            : "Reply recorded (Email service note: saved in log)."
+        );
+      } else {
+        showToast(data.error || "Failed to process reply.", "error");
+      }
+    } catch (err: any) {
+      console.error("Reply error:", err);
+      // Fallback: save to client db
+      await dbService.addEnquiryMessage(
         selectedEnquiry.id,
-        selectedEnquiry.status,
-        notesInput
+        {
+          sender: "ADMIN",
+          sender_name: "Peeyem Traders Operations",
+          sender_email: "peeyemtraders16@gmail.com",
+          message: textToSend,
+          is_internal: isInternal,
+        },
+        nextStatus
       );
-      setSelectedEnquiry(updated);
-      showToast("Follow-up note saved!");
-    } catch (err) {
-      console.error("Error saving notes:", err);
+      setReplyText("");
+      showToast(isInternal ? "Internal note saved." : "Reply recorded in timeline.");
     } finally {
-      setUpdatingStatus(false);
+      setSendingReply(false);
     }
   };
 
+  // Delete Enquiry
   const handleDeleteEnquiry = async (id: string) => {
     try {
       await dbService.deleteEnquiry(id);
-      setSelectedEnquiry(null);
+      if (selectedEnquiry?.id === id) {
+        setSelectedEnquiry(null);
+      }
       setDeleteConfirmId(null);
-      showToast("Enquiry deleted.");
+      showToast("Enquiry deleted successfully.");
     } catch (err) {
-      console.error("Error deleting enquiry:", err);
+      console.error("Delete error:", err);
+      showToast("Failed to delete enquiry", "error");
     }
   };
 
-  const getCleanPhone = (raw: string) => {
-    return raw.replace(/[^0-9]/g, "");
-  };
-
-  const getWhatsAppLink = (enq: DbEnquiry) => {
-    const phoneClean = getCleanPhone(enq.phone);
-    const formattedPhone = phoneClean.length === 10 ? `91${phoneClean}` : phoneClean;
-    const text = encodeURIComponent(
-      `Hello ${enq.name}, thank you for contacting Peeyem Traders regarding your inquiry for "${enq.product_id || enq.subject || "conveyor belting"}". How can we assist you with technical specifications or pricing today?`
-    );
-    return `https://wa.me/${formattedPhone}?text=${text}`;
-  };
-
-  const filteredEnquiries = enquiries.filter((e) => {
-    const matchesSearch =
-      e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (e.email && e.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (e.product_id && e.product_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (e.subject && e.subject.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      e.message.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = statusFilter === "ALL" || e.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
+  // Metrics Calculations
+  const totalCount = enquiries.length;
   const countNew = enquiries.filter((e) => e.status === "NEW").length;
   const countContacted = enquiries.filter((e) => e.status === "CONTACTED").length;
+  const countInProgress = enquiries.filter((e) => e.status === "IN_PROGRESS").length;
+  const countConverted = enquiries.filter((e) => e.status === "CONVERTED").length;
   const countClosed = enquiries.filter((e) => e.status === "CLOSED").length;
+  const countPendingReply = enquiries.filter((e) => {
+    if (e.status === "CLOSED" || e.status === "CONVERTED") return false;
+    const lastMsg = e.conversation?.[e.conversation.length - 1];
+    return !lastMsg || lastMsg.sender === "CUSTOMER" || e.status === "NEW";
+  }).length;
+
+  // Filtered list
+  const filteredEnquiries = enquiries.filter((e) => {
+    // Status filter
+    if (statusFilter !== "ALL" && e.status !== statusFilter) {
+      return false;
+    }
+
+    // Date filter
+    if (dateFilter !== "ALL") {
+      const createdDate = new Date(e.created_at);
+      const now = new Date();
+      if (dateFilter === "TODAY") {
+        if (createdDate.toDateString() !== now.toDateString()) return false;
+      } else if (dateFilter === "WEEK") {
+        const weekAgo = new Date(now.getTime() - 7 * 86400000);
+        if (createdDate < weekAgo) return false;
+      } else if (dateFilter === "MONTH") {
+        const monthAgo = new Date(now.getTime() - 30 * 86400000);
+        if (createdDate < monthAgo) return false;
+      }
+    }
+
+    // Search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName = e.name.toLowerCase().includes(q);
+      const matchEmail = e.email.toLowerCase().includes(q);
+      const matchPhone = e.phone.includes(q);
+      const matchSubject = (e.subject || "").toLowerCase().includes(q);
+      const matchCompany = (e.company || "").toLowerCase().includes(q);
+      const matchId = e.id.toLowerCase().includes(q);
+      return matchName || matchEmail || matchPhone || matchSubject || matchCompany || matchId;
+    }
+
+    return true;
+  });
+
+  const getStatusBadge = (status: EnquiryStatus) => {
+    switch (status) {
+      case "NEW":
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/30">NEW</span>;
+      case "CONTACTED":
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/30">CONTACTED</span>;
+      case "IN_PROGRESS":
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-500/10 text-purple-400 border border-purple-500/30">IN PROGRESS</span>;
+      case "CONVERTED":
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">CONVERTED</span>;
+      case "CLOSED":
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-800 text-slate-400 border border-slate-700">CLOSED</span>;
+      default:
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-800 text-slate-400">{status}</span>;
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    showToast(`Copied ${text} to clipboard!`);
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Toast Notification */}
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 bg-[#ff8d28] text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow-2xl animate-bounce flex items-center gap-2">
-          <span className="material-symbols-outlined text-sm">check_circle</span>
-          <span>{toastMessage}</span>
+        <div
+          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border animate-in fade-in slide-in-from-bottom-2 ${
+            toastMessage.type === "error"
+              ? "bg-red-950 text-red-200 border-red-800"
+              : "bg-slate-900 text-white border-[#ff8d28]/60 shadow-[#ff8d28]/20"
+          }`}
+        >
+          <span className="material-symbols-outlined text-sm text-[#ff8d28]">
+            {toastMessage.type === "error" ? "error" : "check_circle"}
+          </span>
+          <span>{toastMessage.text}</span>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+      {/* Top Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
             <span className="material-symbols-outlined text-[#ff8d28] text-2xl">mail</span>
-            <span>Customer Enquiries</span>
+            <span>Enquiries &amp; Customer Conversations</span>
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time pipeline of requests submitted from public contact and catalog quotation forms.
+            Manage incoming inquiries, reply directly via email, track communication threads, and log internal team notes.
           </p>
         </div>
 
-        <div className="text-xs text-slate-400">
-          Total: <strong className="text-white">{enquiries.length}</strong> inquiries
-        </div>
-      </div>
-
-      {/* Filter Tabs and Search Bar */}
-      <div className="p-4 rounded-xl bg-[#0e1720] border border-slate-800 space-y-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <button
-            onClick={() => setStatusFilter("ALL")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 ${
-              statusFilter === "ALL"
-                ? "bg-[#ff8d28] text-slate-950 shadow-sm"
-                : "bg-slate-900 text-slate-400 hover:text-white"
-            }`}
-          >
-            All Enquiries ({enquiries.length})
-          </button>
-          <button
-            onClick={() => setStatusFilter("NEW")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 flex items-center gap-1.5 ${
-              statusFilter === "NEW"
-                ? "bg-amber-500 text-slate-950 font-black shadow-sm"
-                : "bg-slate-900 text-amber-400 hover:bg-slate-800"
-            }`}
-          >
-            <span>NEW</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950/40 text-amber-200">
-              {countNew}
-            </span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("CONTACTED")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 flex items-center gap-1.5 ${
-              statusFilter === "CONTACTED"
-                ? "bg-blue-500 text-white font-black shadow-sm"
-                : "bg-slate-900 text-blue-400 hover:bg-slate-800"
-            }`}
-          >
-            <span>CONTACTED</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-950/40 text-blue-200">
-              {countContacted}
-            </span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("CLOSED")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 flex items-center gap-1.5 ${
-              statusFilter === "CLOSED"
-                ? "bg-emerald-500 text-slate-950 font-black shadow-sm"
-                : "bg-slate-900 text-emerald-400 hover:bg-slate-800"
-            }`}
-          >
-            <span>CLOSED</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-950/40 text-emerald-200">
-              {countClosed}
-            </span>
-          </button>
-        </div>
-
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
-            search
-          </span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search enquiries by customer name, phone number, email, or requirements..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
-          />
-        </div>
-      </div>
-
-      {/* Enquiries Table */}
-      <div className="rounded-2xl bg-[#0e1720] border border-slate-800 overflow-hidden shadow-sm">
-        {loading ? (
-          <div className="p-12 text-center text-slate-500 text-sm">Synchronizing live enquiries...</div>
-        ) : filteredEnquiries.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 text-sm flex flex-col items-center gap-2">
-            <span className="material-symbols-outlined text-4xl text-slate-600">inbox</span>
-            <span>No enquiries found matching this filter.</span>
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>SMTP: peeyemtraders16@gmail.com</span>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-400 font-bold border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Phone</th>
-                  <th className="py-3 px-4">Subject / Product</th>
-                  <th className="py-3 px-4">Received</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {filteredEnquiries.map((enq) => {
-                  const dateStr = new Date(enq.created_at).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  });
-                  return (
-                    <tr
-                      key={enq.id}
-                      onClick={() => openEnquiryDrawer(enq)}
-                      className="hover:bg-slate-800/50 transition-colors cursor-pointer"
-                    >
-                      <td className="py-3.5 px-4 font-semibold text-white">
-                        <div className="flex items-center gap-2">
-                          {enq.status === "NEW" && (
-                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                          )}
-                          <span>{enq.name}</span>
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-4 font-mono text-xs text-slate-200">
-                        {enq.phone}
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        <span className="font-medium text-slate-200">
-                          {enq.product_id || enq.subject || "General Inquiry"}
-                        </span>
-                        <div className="text-xs text-slate-400 line-clamp-1 mt-0.5">
-                          {enq.message}
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-4 text-xs text-slate-400 whitespace-nowrap">
-                        {dateStr}
-                      </td>
-
-                      <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                            enq.status === "NEW"
-                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/30"
-                              : enq.status === "CONTACTED"
-                              ? "bg-blue-500/10 text-blue-400 border border-blue-500/30"
-                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                          }`}
-                        >
-                          {enq.status}
-                        </span>
-                      </td>
-
-                      <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={() => openEnquiryDrawer(enq)}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#ff8d28] hover:text-white px-3 py-1.5 rounded-lg bg-[#ff8d28]/10 hover:bg-[#ff8d28] transition-colors"
-                        >
-                          <span>Open</span>
-                          <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* ================= ENQUIRY DETAILS MODAL ================= */}
-      {selectedEnquiry && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#0e1720] border border-slate-700 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden my-auto animate-fadeIn">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#ff8d28]">contact_page</span>
-                <h2 className="font-bold text-base text-white">Enquiry Details</h2>
-              </div>
-              <button
-                onClick={() => setSelectedEnquiry(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-full"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
+      {/* 4 Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="p-4 rounded-xl bg-[#0e1720] border border-slate-800/80">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Enquiries</div>
+          <div className="text-2xl font-extrabold text-white mt-1">{totalCount}</div>
+          <div className="text-[10px] text-slate-500 mt-0.5">All customer leads received</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#0e1720] border border-amber-500/20 bg-amber-500/5">
+          <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+            <span>New Leads</span>
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+          </div>
+          <div className="text-2xl font-extrabold text-amber-300 mt-1">{countNew}</div>
+          <div className="text-[10px] text-amber-400/80 mt-0.5">Awaiting initial review</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#0e1720] border border-blue-500/20 bg-blue-500/5">
+          <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Pending Replies</span>
+            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+          </div>
+          <div className="text-2xl font-extrabold text-blue-300 mt-1">{countPendingReply}</div>
+          <div className="text-[10px] text-blue-400/80 mt-0.5">Customer message needs response</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#0e1720] border border-emerald-500/20 bg-emerald-500/5">
+          <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Converted Orders</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div className="text-2xl font-extrabold text-emerald-300 mt-1">{countConverted}</div>
+          <div className="text-[10px] text-emerald-400/80 mt-0.5">Successfully fulfilled sales</div>
+        </div>
+      </div>
+
+      {/* Main Split-Pane Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Column: Filterable Enquiry List (5 cols on lg) */}
+        <div className="lg:col-span-5 space-y-3">
+          {/* Search & Filter Bar */}
+          <div className="p-3 rounded-2xl bg-[#0e1720] border border-slate-800 space-y-2.5">
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+                search
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search name, phone, email, subject, or ID..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
+              />
             </div>
 
-            <div className="p-6 space-y-5">
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-start justify-between">
-                  <h3 className="font-bold text-lg text-white">{selectedEnquiry.name}</h3>
-                  <span
-                    className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      selectedEnquiry.status === "NEW"
-                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/30"
-                        : selectedEnquiry.status === "CONTACTED"
-                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/30"
-                        : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+            {/* Status Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+              {[
+                { key: "ALL", label: "All", count: totalCount },
+                { key: "NEW", label: "New", count: countNew },
+                { key: "CONTACTED", label: "Contacted", count: countContacted },
+                { key: "IN_PROGRESS", label: "In Progress", count: countInProgress },
+                { key: "CONVERTED", label: "Converted", count: countConverted },
+                { key: "CLOSED", label: "Closed", count: countClosed },
+              ].map((filter) => (
+                <button
+                  key={filter.key}
+                  onClick={() => setStatusFilter(filter.key)}
+                  className={`px-2.5 py-1 rounded-lg font-bold shrink-0 transition-colors flex items-center gap-1.5 ${
+                    statusFilter === filter.key
+                      ? "bg-[#ff8d28] text-slate-950 shadow-sm"
+                      : "bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }`}
+                >
+                  <span>{filter.label}</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[9px] ${
+                    statusFilter === filter.key ? "bg-black/20 text-slate-950 font-black" : "bg-slate-800 text-slate-300"
+                  }`}>
+                    {filter.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Date filter dropdown */}
+            <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <span>Showing {filteredEnquiries.length} results</span>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="bg-slate-900 border border-slate-800 rounded px-2 py-0.5 text-[11px] text-slate-300 focus:outline-none focus:border-[#ff8d28]"
+              >
+                <option value="ALL">All Time</option>
+                <option value="TODAY">Today</option>
+                <option value="WEEK">Past 7 Days</option>
+                <option value="MONTH">Past 30 Days</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Scrollable Enquiry List */}
+          <div className="rounded-2xl bg-[#0e1720] border border-slate-800 overflow-hidden divide-y divide-slate-800/60 max-h-[680px] overflow-y-auto">
+            {loading ? (
+              <div className="p-12 text-center text-slate-500 text-xs">Loading enquiries...</div>
+            ) : filteredEnquiries.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
+                <span className="material-symbols-outlined text-4xl text-slate-600">inbox</span>
+                <span>No enquiries found matching this filter.</span>
+              </div>
+            ) : (
+              filteredEnquiries.map((enq) => {
+                const isSelected = selectedEnquiry?.id === enq.id;
+                const conversationCount = enq.conversation?.length || 1;
+                const lastMsg = enq.conversation?.[enq.conversation.length - 1];
+                const lastSender = lastMsg?.sender || "CUSTOMER";
+
+                return (
+                  <div
+                    key={enq.id}
+                    onClick={() => setSelectedEnquiry(enq)}
+                    className={`p-3.5 cursor-pointer transition-colors relative flex flex-col gap-1.5 ${
+                      isSelected
+                        ? "bg-slate-800/80 border-l-4 border-l-[#ff8d28]"
+                        : "hover:bg-slate-900/60"
                     }`}
                   >
-                    {selectedEnquiry.status}
-                  </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 text-[#ff8d28] font-bold text-xs flex items-center justify-center shrink-0">
+                          {enq.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="font-bold text-white text-xs truncate">
+                          {enq.name}
+                        </div>
+                        {enq.company && (
+                          <span className="text-[10px] text-slate-400 truncate max-w-[100px]">
+                            • {enq.company}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="shrink-0 flex items-center gap-1.5">
+                        {getStatusBadge(enq.status)}
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] font-semibold text-slate-300 truncate">
+                      {enq.subject || "Product Inquiry"}
+                    </div>
+
+                    <div className="text-[11px] text-slate-400 line-clamp-1">
+                      {lastMsg?.message || enq.message}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-slate-400">{enq.id}</span>
+                        {conversationCount > 1 && (
+                          <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 font-mono">
+                            💬 {conversationCount}
+                          </span>
+                        )}
+                        {lastSender === "ADMIN" && (
+                          <span className="text-emerald-400 flex items-center gap-0.5">
+                            <span className="material-symbols-outlined text-[12px]">done_all</span>
+                            <span>Replied</span>
+                          </span>
+                        )}
+                      </div>
+                      <span>
+                        {new Date(enq.updated_at || enq.created_at).toLocaleDateString("en-IN", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Active Conversation & Thread (7 cols on lg) */}
+        <div className="lg:col-span-7">
+          {!selectedEnquiry ? (
+            <div className="p-16 rounded-2xl bg-[#0e1720] border border-slate-800 text-center flex flex-col items-center justify-center gap-3 min-h-[500px]">
+              <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
+                <span className="material-symbols-outlined text-3xl">chat</span>
+              </div>
+              <h3 className="text-sm font-bold text-white">No Enquiry Selected</h3>
+              <p className="text-xs text-slate-400 max-w-sm">
+                Select an enquiry from the left list to view customer requirements, send email replies, and post internal follow-up notes.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-[#0e1720] border border-slate-800 flex flex-col overflow-hidden shadow-xl">
+              {/* Header Bar */}
+              <div className="p-4 sm:p-5 border-b border-slate-800/80 bg-slate-950/40 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-base sm:text-lg font-extrabold text-white">
+                        {selectedEnquiry.name}
+                      </h2>
+                      {selectedEnquiry.company && (
+                        <span className="text-xs text-slate-400 font-medium">
+                          ({selectedEnquiry.company})
+                        </span>
+                      )}
+                      <button
+                        onClick={() => copyToClipboard(selectedEnquiry.id)}
+                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-900 text-[#ff8d28] border border-slate-800 hover:border-[#ff8d28] transition-colors"
+                        title="Click to copy ID"
+                      >
+                        {selectedEnquiry.id} 📋
+                      </button>
+                    </div>
+                    <div className="text-xs text-slate-300 font-semibold mt-0.5">
+                      {selectedEnquiry.subject || "Industrial Product Inquiry"}
+                    </div>
+                  </div>
+
+                  {/* Status Dropdown & Delete */}
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedEnquiry.status}
+                      onChange={(e) => handleStatusChange(e.target.value as EnquiryStatus)}
+                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-white focus:outline-none focus:border-[#ff8d28]"
+                    >
+                      <option value="NEW">Status: NEW</option>
+                      <option value="CONTACTED">Status: CONTACTED</option>
+                      <option value="IN_PROGRESS">Status: IN PROGRESS</option>
+                      <option value="CONVERTED">Status: CONVERTED</option>
+                      <option value="CLOSED">Status: CLOSED</option>
+                    </select>
+
+                    <button
+                      onClick={() => setDeleteConfirmId(selectedEnquiry.id)}
+                      className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-red-400 hover:border-red-900/50 transition-colors"
+                      title="Delete enquiry"
+                    >
+                      <span className="material-symbols-outlined text-base">delete</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Phone:</span>
-                    <a
-                      href={`tel:${selectedEnquiry.phone}`}
-                      className="font-mono text-white hover:text-[#ff8d28] font-bold"
-                    >
-                      {selectedEnquiry.phone}
+                {/* Customer Contact Strip */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-800/60 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <span className="material-symbols-outlined text-sm text-slate-500">mail</span>
+                    <a href={`mailto:${selectedEnquiry.email}`} className="hover:text-[#ff8d28] truncate">
+                      {selectedEnquiry.email}
                     </a>
                   </div>
-                  {selectedEnquiry.email && (
-                    <div>
-                      <span className="text-slate-500 block">Email:</span>
-                      <a
-                        href={`mailto:${selectedEnquiry.email}`}
-                        className="text-slate-300 hover:text-white break-all"
-                      >
-                        {selectedEnquiry.email}
-                      </a>
-                    </div>
-                  )}
-                  <div>
-                    <span className="text-slate-500 block">Product Interest:</span>
-                    <span className="text-amber-300 font-semibold">
-                      {selectedEnquiry.product_id || selectedEnquiry.subject || "Not specified"}
-                    </span>
+
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <span className="material-symbols-outlined text-sm text-slate-500">phone</span>
+                    <a href={`tel:${selectedEnquiry.phone}`} className="hover:text-[#ff8d28] truncate">
+                      {selectedEnquiry.phone}
+                    </a>
+                    <a
+                      href={`https://wa.me/${selectedEnquiry.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+                        `Hi ${selectedEnquiry.name}, thank you for contacting Peeyem Traders regarding ${selectedEnquiry.subject || "your enquiry"}.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:underline text-[11px] font-bold"
+                      title="Open WhatsApp chat"
+                    >
+                      WhatsApp
+                    </a>
                   </div>
-                  <div>
-                    <span className="text-slate-500 block">Received:</span>
-                    <span className="text-slate-300">
+
+                  <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
+                    <span className="material-symbols-outlined text-sm text-slate-500">schedule</span>
+                    <span>
                       {new Date(selectedEnquiry.created_at).toLocaleString("en-IN", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
+                        timeZone: "Asia/Kolkata",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                  Client Message / Specifications:
-                </label>
-                <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed">
-                  &ldquo;{selectedEnquiry.message}&rdquo;
+              {/* Conversation Timeline Stream */}
+              <div className="p-4 sm:p-6 space-y-4 max-h-[440px] overflow-y-auto bg-[#0a1017]">
+                {/* 1. Initial Customer Inquiry Card */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-900/60 border border-blue-700/60 text-blue-300 font-bold text-xs flex items-center justify-center shrink-0">
+                    {selectedEnquiry.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-sm p-4 space-y-2 shadow-sm">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-white flex items-center gap-1.5">
+                        <span>{selectedEnquiry.name}</span>
+                        <span className="text-[10px] text-blue-400 font-normal bg-blue-950/60 px-1.5 py-0.2 rounded border border-blue-800/40">
+                          Initial Inquiry
+                        </span>
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(selectedEnquiry.created_at).toLocaleString("en-IN", {
+                          timeZone: "Asia/Kolkata",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
+                      {selectedEnquiry.message}
+                    </div>
+
+                    {selectedEnquiry.source && (
+                      <div className="text-[10px] text-slate-500 font-mono pt-1">
+                        Source: {selectedEnquiry.source}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* 2. Thread Messages (Replies & Notes) */}
+                {selectedEnquiry.conversation &&
+                  selectedEnquiry.conversation.slice(1).map((msg) => {
+                    const isCustomer = msg.sender === "CUSTOMER";
+                    const isInternalNote = Boolean(msg.is_internal);
+
+                    if (isInternalNote) {
+                      return (
+                        <div key={msg.id} className="flex items-start gap-3 ml-6 sm:ml-10">
+                          <div className="w-7 h-7 rounded-full bg-amber-950 border border-amber-800 text-amber-300 flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-xs">lock</span>
+                          </div>
+                          <div className="flex-1 bg-amber-950/20 border border-amber-500/30 rounded-xl p-3.5 space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                                <span>{msg.sender_name || "Internal Staff Note"}</span>
+                                <span className="text-[9px] bg-amber-500/10 text-amber-400 px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">
+                                  Staff Only
+                                </span>
+                              </span>
+                              <span className="text-[10px] text-amber-400/60">
+                                {new Date(msg.timestamp).toLocaleString("en-IN", {
+                                  timeZone: "Asia/Kolkata",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            <div className="text-slate-300 leading-relaxed whitespace-pre-wrap font-sans">
+                              {msg.message}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (isCustomer) {
+                      return (
+                        <div key={msg.id} className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-900/60 border border-blue-700/60 text-blue-300 font-bold text-xs flex items-center justify-center shrink-0">
+                            {selectedEnquiry.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-4 space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-white">{selectedEnquiry.name}</span>
+                              <span className="text-[10px] text-slate-500">
+                                {new Date(msg.timestamp).toLocaleString("en-IN", {
+                                  timeZone: "Asia/Kolkata",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            <div className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
+                              {msg.message}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Admin Reply to customer
+                    return (
+                      <div key={msg.id} className="flex items-start gap-3 justify-end ml-6 sm:ml-10">
+                        <div className="flex-1 bg-[#152332] border border-blue-900/60 rounded-2xl rounded-tr-sm p-4 space-y-1.5 shadow-sm">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-[#ff8d28] flex items-center gap-1.5">
+                              <span>{msg.sender_name || "Peeyem Traders Operations"}</span>
+                              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-800 flex items-center gap-0.5">
+                                <span className="material-symbols-outlined text-[10px]">send</span>
+                                <span>Emailed to Customer</span>
+                              </span>
+                            </span>
+                            <span className="text-[10px] text-slate-400">
+                              {new Date(msg.timestamp).toLocaleString("en-IN", {
+                                timeZone: "Asia/Kolkata",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+
+                          <div className="text-xs text-slate-100 leading-relaxed whitespace-pre-wrap">
+                            {msg.message}
+                          </div>
+
+                          {msg.delivery_status && (
+                            <div className="text-[10px] text-slate-400 flex items-center gap-1 pt-1">
+                              <span className="material-symbols-outlined text-[12px] text-emerald-400">check_circle</span>
+                              <span>Delivered via Gmail SMTP</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-[#ff8d28] text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
+                          P
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                <div ref={messagesEndRef} />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Update Inquiry Status:
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["NEW", "CONTACTED", "CLOSED"] as EnquiryStatus[]).map((st) => (
+              {/* Reply & Note Composer Area */}
+              <div className="p-4 sm:p-5 bg-slate-950/80 border-t border-slate-800 space-y-3">
+                {/* Composer Tab Switcher */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <button
-                      key={st}
                       type="button"
-                      disabled={updatingStatus}
-                      onClick={() => handleStatusChange(st)}
-                      className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all ${
-                        selectedEnquiry.status === st
-                          ? st === "NEW"
-                            ? "bg-amber-500 text-slate-950 border-amber-400"
-                            : st === "CONTACTED"
-                            ? "bg-blue-600 text-white border-blue-400"
-                            : "bg-emerald-600 text-white border-emerald-400"
-                          : "bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800"
+                      onClick={() => setComposerMode("REPLY")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        composerMode === "REPLY"
+                          ? "bg-[#ff8d28] text-slate-950 shadow"
+                          : "bg-slate-900 text-slate-400 hover:text-white"
                       }`}
                     >
-                      {st}
+                      <span className="material-symbols-outlined text-sm">send</span>
+                      <span>Reply via Email to Customer</span>
                     </button>
-                  ))}
+
+                    <button
+                      type="button"
+                      onClick={() => setComposerMode("NOTE")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        composerMode === "NOTE"
+                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                          : "bg-slate-900 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-sm">lock</span>
+                      <span>Internal Staff Note</span>
+                    </button>
+                  </div>
+
+                  <span className="text-[11px] text-slate-500 hidden sm:inline">
+                    {composerMode === "REPLY"
+                      ? `Will send email to: ${selectedEnquiry.email}`
+                      : "Private to admin portal only"}
+                  </span>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Internal Follow-Up Notes:
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={notesInput}
-                    onChange={(e) => setNotesInput(e.target.value)}
-                    placeholder="e.g. Sent quote via WhatsApp, waiting for site specs..."
-                    className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSaveNotes}
-                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-800">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Direct Response Actions:
-                </label>
-                <div className="grid grid-cols-3 gap-2.5">
-                  <a
-                    href={`tel:${selectedEnquiry.phone}`}
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 text-xs font-bold transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-base">call</span>
-                    <span>Call</span>
-                  </a>
-
-                  <a
-                    href={getWhatsAppLink(selectedEnquiry)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-xs font-bold transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-base">chat</span>
-                    <span>WhatsApp</span>
-                  </a>
-
-                  <a
-                    href={selectedEnquiry.email ? `mailto:${selectedEnquiry.email}?subject=Peeyem Traders - ${encodeURIComponent(selectedEnquiry.product_id || "Inquiry Response")}` : "#"}
-                    onClick={(e) => {
-                      if (!selectedEnquiry.email) {
-                        e.preventDefault();
-                        alert("No email address provided for this enquiry. Please use Call or WhatsApp.");
+                {/* Quick Templates Bar (For Email Replies) */}
+                {composerMode === "REPLY" && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+                    <span className="text-[10px] text-slate-500 shrink-0 font-bold uppercase">Quick Snippets:</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReplyText(
+                          (prev) =>
+                            (prev ? prev + "\n\n" : "") +
+                            `Hello ${selectedEnquiry.name},\n\nWe have ready stock available at our Coimbatore depot for your requirement. Our technical executive can dispatch the rolls within 24 hours of PO confirmation.`
+                        )
                       }
-                    }}
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/40 text-xs font-bold transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-base">mail</span>
-                    <span>Email</span>
-                  </a>
-                </div>
-              </div>
+                      className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 shrink-0 border border-slate-800"
+                    >
+                      Ready Stock
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReplyText(
+                          (prev) =>
+                            (prev ? prev + "\n\n" : "") +
+                            `Could you please confirm the required belt width (mm), total length in meters, and top/bottom rubber cover thickness (e.g. 4+2 mm)?`
+                        )
+                      }
+                      className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 shrink-0 border border-slate-800"
+                    >
+                      Request Specs
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReplyText(
+                          (prev) =>
+                            (prev ? prev + "\n\n" : "") +
+                            `We also provide on-site vulcanized hot jointing and emergency mechanical splicing across Tamil Nadu and Kerala quarries.`
+                        )
+                      }
+                      className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 shrink-0 border border-slate-800"
+                    >
+                      On-Site Splicing
+                    </button>
+                  </div>
+                )}
 
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setDeleteConfirmId(selectedEnquiry.id)}
-                  className="text-xs text-rose-400 hover:underline flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-sm">delete</span>
-                  <span>Delete Enquiry</span>
-                </button>
+                {/* Textarea Form */}
+                <form onSubmit={handleSendReply} className="space-y-3">
+                  <textarea
+                    rows={4}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder={
+                      composerMode === "REPLY"
+                        ? `Type your email response to ${selectedEnquiry.name}... (Press send to dispatch email)`
+                        : "Type private internal notes about pricing negotiation, phone discussion, or dispatch schedule..."
+                    }
+                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#ff8d28] resize-y leading-relaxed"
+                  ></textarea>
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedEnquiry(null)}
-                  className="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800"
-                >
-                  Close
-                </button>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    {/* Status change option on send */}
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <span>On send, change status to:</span>
+                      <select
+                        value={composerStatus}
+                        onChange={(e) => setComposerStatus(e.target.value as any)}
+                        className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-[#ff8d28]"
+                      >
+                        <option value="KEEP">Keep Current ({selectedEnquiry.status})</option>
+                        <option value="CONTACTED">Mark as CONTACTED</option>
+                        <option value="IN_PROGRESS">Mark as IN PROGRESS</option>
+                        <option value="CONVERTED">Mark as CONVERTED</option>
+                        <option value="CLOSED">Mark as CLOSED</option>
+                      </select>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={sendingReply || !replyText.trim()}
+                      className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-50 cursor-pointer ${
+                        composerMode === "REPLY"
+                          ? "bg-[#ff8d28] hover:bg-[#e66c00] text-slate-950 shadow-[#ff8d28]/20"
+                          : "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-900/20"
+                      }`}
+                    >
+                      {sendingReply ? (
+                        <>
+                          <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                          <span>{composerMode === "REPLY" ? "Sending Email..." : "Saving Note..."}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-sm">
+                            {composerMode === "REPLY" ? "send" : "save"}
+                          </span>
+                          <span>{composerMode === "REPLY" ? "Send Email Reply" : "Save Internal Note"}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Delete Confirmation */}
+      {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0e1720] border border-slate-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
-            <h3 className="font-bold text-base text-white">Delete Enquiry?</h3>
-            <p className="text-xs text-slate-400">
-              Are you sure you want to permanently remove this customer enquiry record?
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0e1720] border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <span className="material-symbols-outlined text-3xl">warning</span>
+              <h3 className="font-bold text-white text-base">Delete Enquiry?</h3>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Are you sure you want to delete this enquiry and its entire conversation history? This action cannot be undone.
             </p>
-            <div className="flex justify-end gap-2">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
+                type="button"
                 onClick={() => setDeleteConfirmId(null)}
-                className="px-3.5 py-1.5 rounded-lg text-xs text-slate-400"
+                className="px-4 py-2 rounded-lg bg-slate-900 text-slate-300 text-xs font-bold hover:bg-slate-800"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={() => handleDeleteEnquiry(deleteConfirmId)}
-                className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs"
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg"
               >
-                Delete
+                Confirm Delete
               </button>
             </div>
           </div>
@@ -554,7 +906,7 @@ function EnquiriesContent() {
 
 export default function AdminEnquiriesPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading enquiries...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-500 text-sm">Loading enquiries dashboard...</div>}>
       <EnquiriesContent />
     </Suspense>
   );
