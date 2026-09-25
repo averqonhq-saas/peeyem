@@ -7,8 +7,6 @@ import FeaturedProduct from "@/components/FeaturedProduct";
 import Applications from "@/components/Applications";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Gallery from "@/components/Gallery";
-import VideoShowcase from "@/components/VideoShowcase";
-import Testimonials from "@/components/Testimonials";
 import CTASection from "@/components/CTASection";
 import ContactSection from "@/components/ContactSection";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
@@ -44,16 +42,10 @@ export default function Home() {
           {/* 8. Warehouse & Field Visual Gallery */}
           <Gallery />
 
-          {/* 9. Video Showcase */}
-          <VideoShowcase />
-
-          {/* 10. Video Client Feedback & Testimonials */}
-          <Testimonials />
-
-          {/* 11. High-Impact Call To Action */}
+          {/* 9. High-Impact Call To Action */}
           <CTASection />
 
-          {/* 12. Contact Details & Interactive Quotation Form */}
+          {/* 10. Contact Details & Interactive Quotation Form */}
           <ContactSection />
 
           {/* 13. Sticky Floating WhatsApp Action Button */}

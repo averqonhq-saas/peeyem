@@ -187,7 +187,24 @@ function VideosContent() {
         {loading ? (
           <div className="p-12 text-center text-slate-500 text-sm">Synchronizing videos...</div>
         ) : videos.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 text-sm">No promotion videos added yet.</div>
+          <div className="p-12 text-center flex flex-col items-center justify-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400">
+              <span className="material-symbols-outlined text-2xl">movie</span>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-white">No Promotion Videos Added</h3>
+              <p className="text-xs text-slate-400 max-w-sm">
+                All initial demo videos have been removed. Add your official machinery and facility videos whenever you wish.
+              </p>
+            </div>
+            <button
+              onClick={openAddModal}
+              className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ff8d28] hover:bg-[#e66c00] text-slate-950 font-bold text-xs transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">add</span>
+              <span>Add Promotional Video</span>
+            </button>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">

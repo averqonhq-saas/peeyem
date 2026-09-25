@@ -51,94 +51,47 @@ const INITIAL_PRODUCTS: DbProduct[] = PRODUCTS.map((p, idx) => ({
 
 const INITIAL_TESTIMONIALS: DbTestimonial[] = [];
 
-const INITIAL_VIDEOS: DbPromotionVideo[] = [
-  {
-    id: "vid-1",
-    title: "Heavy Duty Fabric Conveyor Belting Splicing & Jointing",
-    youtube_url: "https://www.youtube.com/watch?v=W1YV5piOBmw",
-    youtube_video_id: "W1YV5piOBmw",
-    thumbnail_url: "https://img.youtube.com/vi/W1YV5piOBmw/hqdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/W1YV5piOBmw?rel=0",
-    description: "Step-by-step industrial fabric conveyor belt splicing and vulcanization procedure for heavy aggregate transport lines.",
-    size: "wide",
-    is_active: true,
-    is_featured: true,
-    display_order: 1,
-    created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-  },
-  {
-    id: "vid-2",
-    title: "Industrial Conveyor Belt Hot Press Vulcanizing",
-    youtube_url: "https://www.youtube.com/watch?v=yPYZpwSpKmA",
-    youtube_video_id: "yPYZpwSpKmA",
-    thumbnail_url: "https://img.youtube.com/vi/yPYZpwSpKmA/hqdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/yPYZpwSpKmA?rel=0",
-    description: "Factory technicians executing mechanical and hot press vulcanizing splicing for heavy tensile belting at our Coimbatore depot.",
-    size: "standard",
-    is_active: true,
-    is_featured: false,
-    display_order: 2,
-    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-  },
-  {
-    id: "vid-3",
-    title: "Industrial Rubber & PVC Conveyor Belt Manufacturing",
-    youtube_url: "https://www.youtube.com/watch?v=tCne0Gwgczs",
-    youtube_video_id: "tCne0Gwgczs",
-    thumbnail_url: "https://img.youtube.com/vi/tCne0Gwgczs/hqdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/tCne0Gwgczs?rel=0",
-    description: "Automated calender curing and multi-ply fabric reinforcement manufacturing for high tensile industrial belting.",
-    size: "compact",
-    is_active: true,
-    is_featured: false,
-    display_order: 3,
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-  },
-];
+const INITIAL_VIDEOS: DbPromotionVideo[] = [];
 
-const INITIAL_ENQUIRIES: DbEnquiry[] = [
-  {
-    id: "enq-101",
-    name: "Arun Kumar",
-    phone: "+91 94433 51280",
-    email: "arunkumar.quarry@gmail.com",
-    subject: "Bulk Chevron Belt Order",
-    product_id: "chevron-belts",
-    message: "We need 120 meters of 800mm width 3-ply chevron belting with 15mm cleats for our aggregate screen conveyor. Please provide pricing and delivery timeline to Karur.",
-    status: "NEW",
-    created_at: new Date(Date.now() - 2 * 3600000).toISOString(),
-    updated_at: new Date(Date.now() - 2 * 3600000).toISOString(),
-  },
-  {
-    id: "enq-102",
-    name: "K. Mohanraj",
-    phone: "+91 98432 19876",
-    email: "mohanraj@velanmining.in",
-    subject: "Hot Jointing & Fasteners",
-    product_id: "belt-fasteners",
-    message: "Urgent quote needed for 14# plate fasteners (5 boxes) and 100 meters of skirt rubber 10mm thickness.",
-    status: "CONTACTED",
-    created_at: new Date(Date.now() - 18 * 3600000).toISOString(),
-    updated_at: new Date(Date.now() - 18 * 3600000).toISOString(),
-    notes: "Spoke on phone at 4 PM. Sent technical quote on WhatsApp.",
-  },
-  {
-    id: "enq-103",
-    name: "Priya Sundaram",
-    phone: "+91 98422 73190",
-    email: "priya@sundaramfoods.in",
-    subject: "White PVC Food Grade Belting",
-    product_id: "industrial-belts",
-    message: "Require 40 meters of FDA approved food grade white conveyor belt for bakery cooling line.",
-    status: "CLOSED",
-    created_at: new Date(Date.now() - 72 * 3600000).toISOString(),
-    updated_at: new Date(Date.now() - 72 * 3600000).toISOString(),
-    notes: "Order fulfilled and dispatched via local freight.",
-  },
-];
+const INITIAL_ENQUIRIES: DbEnquiry[] = [];
+
+// Automatic startup cache purge of any legacy test records from browser localStorage
+if (typeof window !== "undefined") {
+  try {
+    const rawTest = localStorage.getItem("peeyem_testimonials");
+    if (rawTest) {
+      const parsed = JSON.parse(rawTest);
+      const filtered = Array.isArray(parsed)
+        ? parsed.filter((t: any) => !["test-1", "test-2", "test-3"].includes(t.id))
+        : [];
+      if (filtered.length !== parsed.length) {
+        localStorage.setItem("peeyem_testimonials", JSON.stringify(filtered));
+      }
+    }
+    const rawVid = localStorage.getItem("peeyem_videos");
+    if (rawVid) {
+      const parsed = JSON.parse(rawVid);
+      const filtered = Array.isArray(parsed)
+        ? parsed.filter((v: any) => !["vid-1", "vid-2", "vid-3"].includes(v.id))
+        : [];
+      if (filtered.length !== parsed.length) {
+        localStorage.setItem("peeyem_videos", JSON.stringify(filtered));
+      }
+    }
+    const rawEnq = localStorage.getItem("peeyem_enquiries");
+    if (rawEnq) {
+      const parsed = JSON.parse(rawEnq);
+      const filtered = Array.isArray(parsed)
+        ? parsed.filter((e: any) => !["enq-101", "enq-102", "enq-103"].includes(e.id))
+        : [];
+      if (filtered.length !== parsed.length) {
+        localStorage.setItem("peeyem_enquiries", JSON.stringify(filtered));
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
 
 const INITIAL_MEDIA: AdminMediaAsset[] = [
   {
@@ -698,31 +651,21 @@ export const dbService = {
         const snap = await getDocs(collection(firestoreDb, "videos"));
         if (!snap.empty) {
           const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbPromotionVideo));
-          return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        } else {
-          for (const v of INITIAL_VIDEOS) {
-            await setDoc(doc(firestoreDb, "videos", v.id), v, { merge: true });
-          }
-          return INITIAL_VIDEOS;
+          return list
+            .filter((v) => !["vid-1", "vid-2", "vid-3"].includes(v.id))
+            .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
         }
       } catch (e) {
         console.warn("Firestore videos error:", e);
       }
     }
     const local = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
-    const enriched = local.map((v) => {
-      // Migrate legacy Rickroll dummy or outdated video
-      if (v.youtube_video_id === "dQw4w9WgXcQ" || v.youtube_url?.includes("dQw4w9WgXcQ")) {
-        const init = INITIAL_VIDEOS.find((iv) => iv.id === v.id);
-        if (init) return { ...v, ...init };
-      }
-      if (!v.size) {
-        const init = INITIAL_VIDEOS.find((iv) => iv.id === v.id);
-        return { ...v, size: init?.size || "wide" };
-      }
-      return v;
-    });
-    return [...enriched].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    const cleaned = local.filter((v) => !["vid-1", "vid-2", "vid-3"].includes(v.id));
+    if (cleaned.length !== local.length) {
+      setLocal("videos", cleaned);
+      broadcastSync("videos");
+    }
+    return [...cleaned].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   },
 
   async addVideo(data: Omit<DbPromotionVideo, "id" | "created_at" | "updated_at">): Promise<DbPromotionVideo> {
@@ -797,26 +740,21 @@ export const dbService = {
         const snap = await getDocs(collection(firestoreDb, "enquiries"));
         if (!snap.empty) {
           const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbEnquiry));
-          return list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        } else {
-          for (const eq of INITIAL_ENQUIRIES) {
-            await setDoc(doc(firestoreDb, "enquiries", eq.id), eq, { merge: true });
-          }
-          return INITIAL_ENQUIRIES;
+          return list
+            .filter((e) => !["enq-101", "enq-102", "enq-103"].includes(e.id))
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         }
       } catch (e) {
         console.warn("Firestore enquiries error:", e);
       }
     }
     const local = getLocal<DbEnquiry[]>("enquiries", INITIAL_ENQUIRIES);
-    const enriched = local.map((e) => {
-      if (e.phone === "9876543210" || e.phone === "9798765432") {
-        const init = INITIAL_ENQUIRIES.find((ie) => ie.id === e.id);
-        if (init) return { ...e, ...init };
-      }
-      return e;
-    });
-    return [...enriched].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const cleaned = local.filter((e) => !["enq-101", "enq-102", "enq-103"].includes(e.id));
+    if (cleaned.length !== local.length) {
+      setLocal("enquiries", cleaned);
+      broadcastSync("enquiries");
+    }
+    return [...cleaned].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   },
 
   async addEnquiry(data: Omit<DbEnquiry, "id" | "created_at" | "updated_at" | "status"> & { status?: EnquiryStatus }): Promise<DbEnquiry> {
