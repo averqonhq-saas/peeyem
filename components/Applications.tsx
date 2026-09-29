@@ -181,12 +181,6 @@ const FINDER_PRODUCTS: Record<string, Array<{ name: string; grade: string; image
       image: "/images/products/tarpaulin.jpg",
       desc: "Protective outdoor yard covers for stored raw materials, machinery, and open cargo trucks.",
     },
-    {
-      name: "Mud Flap",
-      grade: "Reinforced Truck Grade",
-      image: "/images/products/mud-flap.jpg",
-      desc: "Heavy molded rubber splash guards for commercial tippers, dumpers, and trailers.",
-    },
   ],
 };
 

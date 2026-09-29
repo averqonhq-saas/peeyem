@@ -155,26 +155,6 @@ export const PRODUCTS: Product[] = [
     whatsappMessage: "Hi Peeyem Traders, I am looking for Heavy-Duty Industrial Tarpaulins. Please send size options and pricing.",
     detailsLink: "#products",
   },
-  {
-    id: "mud-flap",
-    name: "Mud Flap",
-    categoryTag: "Commercial Vehicle Rubber",
-    categoryColor: "text-slate-800",
-    specTag: "High Impact Molded Rubber",
-    description: "Heavy-gauge vulcanized rubber mud flaps designed for commercial tipper trucks, trailers, and earth-moving machinery to block flying stones, road spray, and debris.",
-    grades: ["Heavy Commercial Tipper", "Trailer Flaps", "Custom Canvas Reinforced"],
-    specifications: [
-      { key: "Material", value: "Tear-Resistant Molded Rubber with Fabric Canvas" },
-      { key: "Impact Endurance", value: "Withstands Gravel Strike & High-Speed Highway Spray" },
-      { key: "Fitting", value: "Pre-punched Mounting Holes for Fast Installation" },
-      { key: "Durability", value: "Zero Weather Cracking under Severe Heat & Rain" },
-    ],
-    applications: ["Commercial Vehicles", "Stone Crushing Units", "Mining Tippers"],
-    image: "/images/products/mud-flap.jpg",
-    alt: "Heavy Duty Commercial Truck Rubber Mud Flaps",
-    whatsappMessage: "Hi Peeyem Traders, I am inquiring about Commercial Vehicle Rubber Mud Flaps. Please share sizes and rates.",
-    detailsLink: "#products",
-  },
 ];
 
 export const COMPANY_INFO = {

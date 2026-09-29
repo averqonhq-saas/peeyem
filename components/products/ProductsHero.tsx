@@ -92,7 +92,7 @@ export default function ProductsHero({
                   <span className="material-symbols-outlined text-slate-400 text-xl">search</span>
                   <input
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                    placeholder="Search Rubber Conveyor, PU, PVC, V-Belt, Cow Mat, Sheets, Tarpaulin, Mud Flaps..."
+                    placeholder="Search Rubber Conveyor, PU, PVC, V-Belt, Cow Mat, Sheets, Tarpaulin..."
                     type="text"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
