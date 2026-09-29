@@ -122,7 +122,7 @@ export default function FeaturedProduct() {
 
                 <div className="relative overflow-hidden rounded-2xl bg-slate-100 aspect-[4/3] preserve-3d">
                   <Image
-                    src="/images/products/rubber-conveyor-belt.jpg"
+                    src="/images/products/rubber-conveyor-belt-hero.jpg"
                     alt="Peeyem Traders Heavy Duty Rubber Conveyor Belt Roll"
                     fill
                     className="object-cover"
