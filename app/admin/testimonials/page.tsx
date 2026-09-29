@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { dbService } from "@/lib/db";
+import { dbService, normalizeImageUrl } from "@/lib/db";
 import { DbTestimonial } from "@/types/admin";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { parseYouTubeUrl } from "@/lib/youtube";
@@ -124,7 +124,7 @@ function TestimonialsContent() {
           customer_name: customerName.trim(),
           company: company.trim(),
           designation: designation.trim(),
-          profile_image_url: profileImageUrl.trim(),
+          profile_image_url: normalizeImageUrl(profileImageUrl),
           rating,
           testimonial: testimonial.trim(),
           youtube_url: youtubeUrl.trim() || undefined,
@@ -137,7 +137,7 @@ function TestimonialsContent() {
           customer_name: customerName.trim(),
           company: company.trim(),
           designation: designation.trim(),
-          profile_image_url: profileImageUrl.trim(),
+          profile_image_url: normalizeImageUrl(profileImageUrl),
           rating,
           testimonial: testimonial.trim(),
           youtube_url: youtubeUrl.trim() || undefined,
@@ -303,9 +303,9 @@ function TestimonialsContent() {
               <div className="pt-4 mt-4 border-t border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 overflow-hidden relative shrink-0">
-                    {item.profile_image_url ? (
+                    {normalizeImageUrl(item.profile_image_url) ? (
                       <Image
-                        src={item.profile_image_url}
+                        src={normalizeImageUrl(item.profile_image_url)}
                         alt={item.customer_name}
                         fill
                         sizes="36px"

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { dbService } from "@/lib/db";
+import { dbService, normalizeImageUrl } from "@/lib/db";
 import { DbTestimonial } from "@/types/admin";
 import { parseYouTubeUrl } from "@/lib/youtube";
 
@@ -177,9 +177,9 @@ export default function Testimonials() {
               <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg overflow-hidden relative shrink-0 ring-2 ring-blue-100">
-                    {currentReview.profile_image_url ? (
+                    {normalizeImageUrl(currentReview.profile_image_url) ? (
                       <Image
-                        src={currentReview.profile_image_url}
+                        src={normalizeImageUrl(currentReview.profile_image_url)}
                         alt={currentReview.customer_name}
                         fill
                         sizes="48px"

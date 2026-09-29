@@ -132,7 +132,7 @@ export default function ProductsHero({
               <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl border border-slate-200 group">
                 <div className="relative h-80 sm:h-96 w-full overflow-hidden bg-slate-100">
                   <Image
-                    src="/images/products/rubber-conveyor-belt.jpg"
+                    src="/images/products/rubber-conveyor-belt-hero.jpg"
                     alt="Heavy-Duty Rubber Conveyor Belt Roll"
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700"

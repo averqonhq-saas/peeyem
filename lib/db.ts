@@ -51,9 +51,73 @@ const INITIAL_VIDEOS: DbPromotionVideo[] = [];
 
 const INITIAL_ENQUIRIES: DbEnquiry[] = [];
 
+export function normalizeImageUrl(url?: string | null): string {
+  if (!url || typeof url !== "string") return "";
+  const clean = url.trim();
+  if (!clean) return "";
+
+  // Handle Windows paths or accidental paths pasted from file explorer
+  // e.g. "C:\Users\...\public\images\products\pu-conveyor-belt.jpg"
+  // or backslash-stripped: "C:UsersMuneeswaranDocumentsPEEYEM-TRADERSpublicimagesproductspu-conveyor-belt.jpg"
+  const publicImgMatch = clean.match(/(?:public)?[\\\/]?(images[\\\/].+)$/i);
+  if (publicImgMatch) {
+    return "/" + publicImgMatch[1].replace(/\\/g, "/");
+  }
+
+  const corruptedMatch = clean.match(/imagesproducts([a-zA-Z0-9_\-\.]+)/i);
+  if (corruptedMatch) {
+    return `/images/products/${corruptedMatch[1]}`;
+  }
+
+  // If path is a local Windows file path with drive letter (e.g. C:\... or C:...)
+  if (/^[a-zA-Z]:/.test(clean)) {
+    const filenameMatch = clean.match(/([a-zA-Z0-9_\-]+\.(?:jpg|jpeg|png|webp|avif|svg))$/i);
+    if (filenameMatch) {
+      return `/images/products/${filenameMatch[1]}`;
+    }
+    return "";
+  }
+
+  // Starts with valid web URL or data URL
+  if (clean.startsWith("http://") || clean.startsWith("https://") || clean.startsWith("data:")) {
+    return clean;
+  }
+
+  // If relative path
+  if (clean.startsWith("/")) {
+    return clean;
+  }
+
+  if (clean.startsWith("images/")) {
+    return "/" + clean;
+  }
+
+  return clean;
+}
+
 // Automatic startup cache purge of any legacy test records from browser localStorage
 if (typeof window !== "undefined") {
   try {
+    const rawProd = localStorage.getItem("peeyem_products");
+    if (rawProd) {
+      const parsed = JSON.parse(rawProd);
+      if (Array.isArray(parsed)) {
+        let changed = false;
+        const cleaned = parsed.map((p: any) => {
+          if (p.image_url) {
+            const normalized = normalizeImageUrl(p.image_url);
+            if (normalized !== p.image_url) {
+              changed = true;
+              return { ...p, image_url: normalized };
+            }
+          }
+          return p;
+        });
+        if (changed) {
+          localStorage.setItem("peeyem_products", JSON.stringify(cleaned));
+        }
+      }
+    }
     const rawTest = localStorage.getItem("peeyem_testimonials");
     if (rawTest) {
       const parsed = JSON.parse(rawTest);
@@ -251,7 +315,14 @@ export const dbService = {
           q,
           (snap) => {
             if (!snap.empty) {
-              const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbProduct));
+              const list = snap.docs.map((d) => {
+                const data = d.data();
+                return {
+                  id: d.id,
+                  ...data,
+                  image_url: normalizeImageUrl(data.image_url),
+                } as DbProduct;
+              });
               callback(list);
             }
           },
@@ -431,7 +502,14 @@ export const dbService = {
       try {
         const snap = await getDocs(collection(firestoreDb, "products"));
         if (!snap.empty) {
-          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbProduct));
+          const list = snap.docs.map((d) => {
+            const data = d.data();
+            return {
+              id: d.id,
+              ...data,
+              image_url: normalizeImageUrl(data.image_url),
+            } as DbProduct;
+          });
           return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
         } else {
           // Firestore collection is empty: seed initial products into Firestore
@@ -445,7 +523,9 @@ export const dbService = {
       }
     }
     const local = getLocal<DbProduct[]>("products", INITIAL_PRODUCTS);
-    return [...local].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    return [...local]
+      .map((p) => ({ ...p, image_url: normalizeImageUrl(p.image_url) }))
+      .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   },
 
   async addProduct(data: Omit<DbProduct, "id" | "created_at" | "updated_at">): Promise<DbProduct> {
@@ -453,6 +533,7 @@ export const dbService = {
     const id = data.slug || "prod-" + Date.now();
     const item: DbProduct = {
       ...data,
+      image_url: normalizeImageUrl(data.image_url),
       id,
       created_at: now,
       updated_at: now,
@@ -478,13 +559,17 @@ export const dbService = {
 
   async updateProduct(id: string, updates: Partial<DbProduct>): Promise<DbProduct> {
     const now = new Date().toISOString();
+    const sanitizedUpdates = {
+      ...updates,
+      ...(updates.image_url !== undefined ? { image_url: normalizeImageUrl(updates.image_url) } : {}),
+    };
 
     if (isFirebaseConfigured && firestoreDb) {
       try {
         await setDoc(
           doc(firestoreDb, "products", id),
           {
-            ...updates,
+            ...sanitizedUpdates,
             updated_at: now,
           },
           { merge: true }
@@ -498,14 +583,14 @@ export const dbService = {
     let updated: DbProduct | null = null;
     const next = current.map((p) => {
       if (p.id === id) {
-        updated = { ...p, ...updates, updated_at: now };
+        updated = { ...p, ...sanitizedUpdates, updated_at: now };
         return updated;
       }
       return p;
     });
     setLocal("products", next);
     broadcastSync("products");
-    return updated || ({ id, ...updates } as DbProduct);
+    return updated || ({ id, ...sanitizedUpdates } as DbProduct);
   },
 
   async deleteProduct(id: string): Promise<void> {

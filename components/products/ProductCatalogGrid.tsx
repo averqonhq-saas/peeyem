@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { COMPANY_INFO } from "@/data/products";
-import { dbService } from "@/lib/db";
+import { dbService, normalizeImageUrl } from "@/lib/db";
 import { DbProduct } from "@/types/admin";
 import ProductRFQModal from "./ProductRFQModal";
 
@@ -209,9 +209,9 @@ export default function ProductCatalogGrid({
                       className="relative aspect-[16/10] w-full bg-surface-dim overflow-hidden cursor-pointer"
                       onClick={() => setDetailProduct(prod)}
                     >
-                      {prod.image_url ? (
+                      {normalizeImageUrl(prod.image_url) ? (
                         <Image
-                          src={prod.image_url}
+                          src={normalizeImageUrl(prod.image_url)}
                           alt={prod.name}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -348,9 +348,9 @@ export default function ProductCatalogGrid({
                               className="relative w-14 h-14 rounded-xl overflow-hidden bg-surface-dim shrink-0 border border-outline-variant/20 cursor-pointer"
                               onClick={() => setDetailProduct(prod)}
                             >
-                              {prod.image_url ? (
+                              {normalizeImageUrl(prod.image_url) ? (
                                 <Image
-                                  src={prod.image_url}
+                                  src={normalizeImageUrl(prod.image_url)}
                                   alt={prod.name}
                                   fill
                                   sizes="56px"
@@ -454,9 +454,9 @@ export default function ProductCatalogGrid({
           >
             {/* Modal Header Image Banner */}
             <div className="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden">
-              {detailProduct.image_url ? (
+              {normalizeImageUrl(detailProduct.image_url) ? (
                 <Image
-                  src={detailProduct.image_url}
+                  src={normalizeImageUrl(detailProduct.image_url)}
                   alt={detailProduct.name}
                   fill
                   sizes="650px"

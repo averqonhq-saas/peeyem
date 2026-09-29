@@ -132,8 +132,8 @@ export default function Hero() {
                 {/* Main Product Image Container */}
                 <div className="relative overflow-hidden rounded-xl bg-slate-100 aspect-[4/3] preserve-3d">
                   <Image
-                    src="/images/products/rubber-conveyor-belt.jpg"
-                    alt="Heavy Duty Industrial Rubber Conveyor Belt Roll"
+                    src="/images/products/pu-conveyor-belt.jpg"
+                    alt="Food Grade PU Industrial Conveyor Belt"
                     fill
                     priority
                     fetchPriority="high"
@@ -148,10 +148,10 @@ export default function Hero() {
                   <div className="parallax-layer-spec absolute bottom-3 left-3 right-3 flex items-center justify-between p-3 rounded-lg bg-white/95 backdrop-blur-md shadow-md border border-slate-200 z-10">
                     <div className="flex flex-col">
                       <span className="text-[10px] uppercase font-black tracking-wider text-amber-600">Core Inventory</span>
-                      <span className="text-sm font-bold text-slate-900">Heavy-Duty Rubber Conveyor Belts</span>
+                      <span className="text-sm font-bold text-slate-900">Food Grade PU Conveyor Belts</span>
                     </div>
                     <span className="px-2.5 py-1 rounded bg-amber-100 text-amber-900 font-mono text-[11px] font-bold shrink-0 ml-2">
-                      M24 &bull; SHR Grades
+                      FDA &bull; Food Grade
                     </span>
                   </div>
                 </div>
@@ -160,8 +160,8 @@ export default function Hero() {
                 <div className="parallax-layer-card-overlap absolute -bottom-5 -left-4 hidden sm:flex items-center gap-3 p-3 rounded-xl bg-white shadow-xl max-w-[240px] border border-slate-200 z-20">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
                     <Image
-                      src="/images/products/pu-conveyor-belt.jpg"
-                      alt="Food Grade PU Belts"
+                      src="/images/products/rubber-conveyor-belt-hero.jpg"
+                      alt="Heavy-Duty Rubber Conveyor Belts"
                       fill
                       className="object-cover"
                       sizes="48px"
@@ -169,9 +169,9 @@ export default function Hero() {
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[9px] uppercase font-black text-amber-600">Hygienic Grade</span>
-                    <span className="text-xs font-bold text-slate-900 truncate">Food Machinery PU</span>
-                    <span className="text-[10px] text-slate-500 truncate">Appalam &amp; Chapati Lines</span>
+                    <span className="text-[9px] uppercase font-black text-amber-600">Heavy Duty</span>
+                    <span className="text-xs font-bold text-slate-900 truncate">Rubber Conveyor</span>
+                    <span className="text-[10px] text-slate-500 truncate">M24 &amp; SHR Grades</span>
                   </div>
                 </div>
 
@@ -183,7 +183,6 @@ export default function Hero() {
                   </span>
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-wider leading-none">Industrial Quality</span>
-                    <span className="text-[9px] text-slate-500 font-mono leading-tight">Salem &amp; Cbe Depot</span>
                   </div>
                 </div>
 

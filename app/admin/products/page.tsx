@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { dbService } from "@/lib/db";
+import { dbService, normalizeImageUrl } from "@/lib/db";
 import { DbProduct, ProductSpecification } from "@/types/admin";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
@@ -172,7 +172,7 @@ function ProductsContent() {
           category_id: finalCategory,
           short_description: (shortDescription || "").trim(),
           description: (description || "").trim(),
-          image_url: (imageUrl || "").trim(),
+          image_url: normalizeImageUrl(imageUrl),
           price_range: (priceRange || "").trim(),
           specifications: cleanSpecs,
           is_active: Boolean(isActive),
@@ -187,7 +187,7 @@ function ProductsContent() {
           category_id: finalCategory,
           short_description: (shortDescription || "").trim(),
           description: (description || "").trim(),
-          image_url: (imageUrl || "").trim(),
+          image_url: normalizeImageUrl(imageUrl),
           price_range: (priceRange || "").trim(),
           specifications: cleanSpecs,
           is_active: Boolean(isActive),
@@ -345,9 +345,9 @@ function ProductsContent() {
 
                     <td className="py-3 px-4">
                       <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-800 overflow-hidden relative shrink-0">
-                        {p.image_url ? (
+                        {normalizeImageUrl(p.image_url) ? (
                           <Image
-                            src={p.image_url}
+                            src={normalizeImageUrl(p.image_url)}
                             alt={p.name}
                             fill
                             sizes="48px"
