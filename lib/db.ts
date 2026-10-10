@@ -28,7 +28,7 @@ import { PRODUCTS } from "@/data/products";
 import { parseYouTubeUrl } from "./youtube";
 
 // Initial Seed Data with requested schema fields
-const INITIAL_PRODUCTS: DbProduct[] = PRODUCTS.map((p, idx) => ({
+export const INITIAL_PRODUCTS: DbProduct[] = PRODUCTS.map((p, idx) => ({
   id: p.id,
   name: p.name,
   slug: p.id,
@@ -180,23 +180,113 @@ const INITIAL_MEDIA: AdminMediaAsset[] = [
   },
 ];
 
-const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
+export const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
+  {
+    id: "gal-prod-rubber",
+    url: "/images/products/rubber-conveyor-belt.jpg",
+    caption: "Heavy Duty Rubber Conveyor Belting (M24 / N17 / HR / SHR)",
+    category: "products",
+    display_order: 1,
+    is_active: true,
+    created_at: new Date(Date.now() - 35 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 35 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-pu",
+    url: "/images/products/pu-conveyor-belt.jpg",
+    caption: "Food Grade PU Polyurethane Conveyor Belt",
+    category: "products",
+    display_order: 2,
+    is_active: true,
+    created_at: new Date(Date.now() - 34 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 34 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-pvc",
+    url: "/images/products/pvc-conveyor-belt.jpg",
+    caption: "Industrial PVC Conveyor Belting (Diamond Grip & Smooth)",
+    category: "products",
+    display_order: 3,
+    is_active: true,
+    created_at: new Date(Date.now() - 33 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 33 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-vbelt",
+    url: "/images/products/v-belt.jpg",
+    caption: "High-Torque Industrial Power Transmission V-Belts",
+    category: "products",
+    display_order: 4,
+    is_active: true,
+    created_at: new Date(Date.now() - 32 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 32 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-cowmat",
+    url: "/images/products/cow-mat.jpg",
+    caption: "Heavy Duty Vulcanized Rubber Cow Comfort Mats",
+    category: "products",
+    display_order: 5,
+    is_active: true,
+    created_at: new Date(Date.now() - 31 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 31 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-sheet",
+    url: "/images/products/rubber-sheet.jpg",
+    caption: "Industrial Vulcanized Rubber Sheeting & Liners",
+    category: "products",
+    display_order: 6,
+    is_active: true,
+    created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-fasteners",
+    url: "/images/products/conveyor-belt-fasteners.jpg",
+    caption: "Mechanical Conveyor Belt Fasteners & Splicing Plates",
+    category: "products",
+    display_order: 7,
+    is_active: true,
+    created_at: new Date(Date.now() - 29 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 29 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-tarpaulin",
+    url: "/images/products/tarpaulin.jpg",
+    caption: "Heavy-Duty Multi-Layer Waterproof Tarpaulins",
+    category: "depots",
+    display_order: 8,
+    is_active: true,
+    created_at: new Date(Date.now() - 28 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 28 * 86400000).toISOString(),
+  },
+  {
+    id: "gal-prod-rubber-hero",
+    url: "/images/products/rubber-conveyor-belt-hero.jpg",
+    caption: "Quarry Heavy Duty Rubber Conveyor Belt Roll Staging",
+    category: "field",
+    display_order: 9,
+    is_active: true,
+    created_at: new Date(Date.now() - 27 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 27 * 86400000).toISOString(),
+  },
   {
     id: "gal-1",
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuDgqOYZAdlPsSXp8KRxib9a55ZCWgAEiemhK7uh5ijWHxzXlOav-Mg0yOoE5kNo0biwJvY_Y8XOZiIZxRNCTBJJlN6IbNI_Y2WmnHvQOqZK4F5OfaLPillUb3dsWv5_UcraxLEZCcVffhdSFoVddQqnqf1R-hy9zXRISaU0VjA9iSR2UMe5n5nP5UtZfbsz0hnjCFB0_QJi0vTontyB6GxmAKdvHq8Vf1xWNhafprxP-YgoJaO_fzgFqg",
     caption: "Chevron Cleated High-Angle Roll Assembly",
     category: "products",
-    display_order: 1,
+    display_order: 10,
     is_active: true,
-    created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+    created_at: new Date(Date.now() - 26 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 26 * 86400000).toISOString(),
   },
   {
     id: "gal-2",
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkBo8yqVorpCynzioX_BBPHgU0JBhLzroHNbWerJok2IBjlVxe4a19F0hwSjJA_A-u7VEHV7_GNP1j1Z-fag9ZLHgSlcIBTXIvWaE7LyR9c-DXY5JtZoI1MRpj2sW9jev62dt1NU7MZnHWs_B6w-LR6R4el0ls06totDAeYn18QkRVZTWEqH9JtH4qV3ViWwT0nKK3UCamfWnqm4VKDkuBCtKnLRDSIF-b_KlqPOTF_bnwcjzgdyX5kA",
     caption: "Industrial Rubber Sheeting Warehouse Staging",
     category: "depots",
-    display_order: 2,
+    display_order: 11,
     is_active: true,
     created_at: new Date(Date.now() - 25 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 25 * 86400000).toISOString(),
@@ -206,7 +296,7 @@ const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCsKPWW63Qi05s9yRq3dC3WVHs1pOGgG0no6Y3MjGLi_56i0E1p8zpaO-7kfsFuv-Yu9neJZLOpXrIh1susAFnE3H20RCCAK3PHgnuxHqsSUbK5IS2q4a-wD3S4tfBzjGn7Ym2wtX8XA39E11B22DsUBsig1bjBhoX4tg-KUhjsgYSqQBbuWbtAQ7M5IoOIYH-xVrt7jPc0EAKyrkYJGotMwTFgZ7OAMseRPhlvdB9xKByme5YgQppGuA",
     caption: "Granite Aggregate Primary Crushing Line",
     category: "field",
-    display_order: 3,
+    display_order: 12,
     is_active: true,
     created_at: new Date(Date.now() - 20 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 20 * 86400000).toISOString(),
@@ -216,7 +306,7 @@ const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCEFx7k55IA317wq6EHUhLVmbSA3ZIzfHPhO5hEOz0wHiSUJQ4E92SFzJc_XbeT3uDxrCRorkiaOe_ljIId4g3PdoPG2Kk2bZOsyZ5x5_IyWW_Rv921lBFU2Xj53elmi1iMQ4rd_k-6ECgOgit-5H0otzoyaAWhFhyR6uAw1yM0MKTP-JaFqT-oR8XHc0n3sHz39MMSIYjcqPZFaipoPUTeknJraGhUtyKLaem4GS3kIBzFNki_55xMHw",
     caption: "Multi-Ply Flat Carcass Belting Inventory",
     category: "products",
-    display_order: 4,
+    display_order: 13,
     is_active: true,
     created_at: new Date(Date.now() - 15 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 15 * 86400000).toISOString(),
@@ -226,7 +316,7 @@ const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuB3_buoWxyGzU0ywanzn2SfpTbj0BG58YmEAibe81SezkIC7p66a6YkCyZ0LMP8DWviLA-Volznrco0P2Jf_nlYKKp5UL2prH6f9WDqEZoMA8HJ0wrdy3ds67awsVVChnVIh3A9E8SUuRF1Ih_Piqb28KHxd79W7Wm9ekOz0s2MmJWRwItkAG8H2zsAPgelghoyQs9Ay_Wgy88mNzg7jNVmH1hzafBNkmVwr-PpIKQa95hHAUpIg4gXDA",
     caption: "Steep-Angle Conveyor Cleat Adhesion Detail",
     category: "equipment",
-    display_order: 5,
+    display_order: 14,
     is_active: true,
     created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 10 * 86400000).toISOString(),
@@ -236,7 +326,7 @@ const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCs7yTSXlzcVax7PnNCQvjTa6XDREv5oH9E4W48DlxLVJNI8q_qpUogVXA1GT3kf76303hv0Xn82TgcRTpxxZTGo2xwXWNzbDUXOaRmXBQwx50MKroHRm4VWUr9s15xjl3Y-QWEamUWSHLIlt31KZKr4PxznfDzpxama7jNdbiFJHD-_J2al4GYniaTi5SLn-q1S7-Hn-yUj1HJ3HBkDRzLT-iwxELFZtmMVvxN1vtpFKDwcMig2Lcx-A",
     caption: "Heavy Wear Natural Rubber Lining Rolls",
     category: "depots",
-    display_order: 6,
+    display_order: 15,
     is_active: true,
     created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 5 * 86400000).toISOString(),
@@ -246,7 +336,7 @@ const INITIAL_GALLERY_IMAGES: DbGalleryImage[] = [
     url: "https://lh3.googleusercontent.com/aida-public/AB6AXuA9rZd_mnTr1CTvZzvMWgYHLE-fO1KLDn09VkqIpMT7bB2Aq84j2fJIBWl9laruoBVrr2U0OSIZVip_nG_aqmktotIPeTa2_gpc6gKMIeN1NB1-RIR9bpth9qRPOSjwN631vQI_AQm7FbVdcTGhr144nwPrVYAgEgdCgfC5IHR0HI0XGQ14Zj38hzyqvkvIuhxPcVDenMUlbyymmH_ifNDyox6aM1nrcueDlKVNjtxm",
     caption: "South Ukkadam Central Slitting Depot",
     category: "depots",
-    display_order: 7,
+    display_order: 16,
     is_active: true,
     created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
     updated_at: new Date(Date.now() - 2 * 86400000).toISOString(),
@@ -510,6 +600,13 @@ export const dbService = {
               image_url: normalizeImageUrl(data.image_url),
             } as DbProduct;
           });
+          // Ensure any newly added seed products (e.g. fasteners) are synchronized into Firestore
+          for (const ip of INITIAL_PRODUCTS) {
+            if (!list.some((item) => item.id === ip.id)) {
+              setDoc(doc(firestoreDb, "products", ip.id), ip, { merge: true }).catch(() => {});
+              list.push(ip);
+            }
+          }
           return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
         } else {
           // Firestore collection is empty: seed initial products into Firestore
@@ -523,7 +620,13 @@ export const dbService = {
       }
     }
     const local = getLocal<DbProduct[]>("products", INITIAL_PRODUCTS);
-    return [...local]
+    const existingIds = new Set(local.map((p) => p.id));
+    const missing = INITIAL_PRODUCTS.filter((ip) => !existingIds.has(ip.id));
+    const merged = missing.length > 0 ? [...local, ...missing] : local;
+    if (missing.length > 0) {
+      setLocal("products", merged);
+    }
+    return [...merged]
       .map((p) => ({ ...p, image_url: normalizeImageUrl(p.image_url) }))
       .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   },
@@ -1006,13 +1109,32 @@ export const dbService = {
         const q = query(collection(firestoreDb, "gallery_images"), orderBy("display_order", "asc"));
         const snap = await getDocs(q);
         if (!snap.empty) {
-          return snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbGalleryImage));
+          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbGalleryImage));
+          for (const ig of INITIAL_GALLERY_IMAGES) {
+            if (!list.some((item) => item.id === ig.id)) {
+              setDoc(doc(firestoreDb, "gallery_images", ig.id), ig, { merge: true }).catch(() => {});
+              list.push(ig);
+            }
+          }
+          return list.sort((a, b) => a.display_order - b.display_order);
+        } else {
+          for (const g of INITIAL_GALLERY_IMAGES) {
+            await setDoc(doc(firestoreDb, "gallery_images", g.id), g, { merge: true });
+          }
+          return INITIAL_GALLERY_IMAGES;
         }
       } catch (e) {
         console.warn("Firestore getGalleryImages error:", e);
       }
     }
-    return getLocal<DbGalleryImage[]>("gallery_images", INITIAL_GALLERY_IMAGES);
+    const local = getLocal<DbGalleryImage[]>("gallery_images", INITIAL_GALLERY_IMAGES);
+    const existingIds = new Set(local.map((g) => g.id));
+    const missing = INITIAL_GALLERY_IMAGES.filter((ig) => !existingIds.has(ig.id));
+    const merged = missing.length > 0 ? [...local, ...missing] : local;
+    if (missing.length > 0) {
+      setLocal("gallery_images", merged);
+    }
+    return [...merged].sort((a, b) => a.display_order - b.display_order);
   },
 
   subscribeGalleryImages(callback: (list: DbGalleryImage[]) => void): () => void {

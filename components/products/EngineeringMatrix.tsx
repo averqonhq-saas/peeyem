@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function EngineeringMatrix() {
-  const [activeTab, setActiveTab] = useState<"grades" | "pulleys" | "chevron">("grades");
+  const [activeTab, setActiveTab] = useState<"grades" | "pulleys" | "chevron" | "fasteners">("grades");
 
   return (
     <section className="w-full bg-surface-container-low py-space-xl">
@@ -54,6 +54,17 @@ export default function EngineeringMatrix() {
             onClick={() => setActiveTab("chevron")}
           >
             Chevron Cleat Geometry Specs
+          </button>
+          <button
+            type="button"
+            className={`px-space-md py-2 font-label-md text-label-md rounded-lg transition-all cursor-pointer ${
+              activeTab === "fasteners"
+                ? "bg-primary text-on-primary font-semibold shadow-sm"
+                : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface"
+            }`}
+            onClick={() => setActiveTab("fasteners")}
+          >
+            Fastener Sizing &amp; Joint Matrix
           </button>
         </div>
 
@@ -222,6 +233,76 @@ export default function EngineeringMatrix() {
                   <span>Min Pulley: 400mm</span>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Fastener Sizing Matrix */}
+        {activeTab === "fasteners" && (
+          <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border border-outline-variant/20">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-body-sm text-body-sm">
+                <thead className="bg-surface-container font-label-sm text-label-sm uppercase text-on-surface-variant">
+                  <tr>
+                    <th className="py-3 px-space-md">Fastener Specification</th>
+                    <th className="py-3 px-space-md">Joint Type</th>
+                    <th className="py-3 px-space-md">Belt Thickness Range</th>
+                    <th className="py-3 px-space-md">Min. Pulley Diameter</th>
+                    <th className="py-3 px-space-md">Max. Belt Tension (PIW / kN/m)</th>
+                    <th className="py-3 px-space-md">Primary Industrial Duty</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-container font-code-spec text-code-spec">
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-primary">Bolt Solid Plate #1</td>
+                    <td className="py-3.5 px-space-md">Solid Compression Plate</td>
+                    <td className="py-3.5 px-space-md">5.0 mm – 11.0 mm</td>
+                    <td className="py-3.5 px-space-md">300 mm</td>
+                    <td className="py-3.5 px-space-md">150 PIW (26 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">Grain handling, sand, bag conveyors, coir blocks</td>
+                  </tr>
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-primary">Bolt Solid Plate #140</td>
+                    <td className="py-3.5 px-space-md">High-Tension Compression Plate</td>
+                    <td className="py-3.5 px-space-md">5.0 mm – 11.0 mm</td>
+                    <td className="py-3.5 px-space-md">350 mm</td>
+                    <td className="py-3.5 px-space-md">225 PIW (40 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">Secondary crusher discharge, gravel &amp; clinker handling</td>
+                  </tr>
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-primary">Bolt Solid Plate #190</td>
+                    <td className="py-3.5 px-space-md">Heavy Impact Solid Plate</td>
+                    <td className="py-3.5 px-space-md">8.0 mm – 14.0 mm</td>
+                    <td className="py-3.5 px-space-md">450 mm</td>
+                    <td className="py-3.5 px-space-md">375 PIW (65 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">Quarry jaw crushers, blue metal aggregate &amp; ore</td>
+                  </tr>
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-primary">Bolt Solid Plate #2</td>
+                    <td className="py-3.5 px-space-md">Extra Heavy Duty Plate</td>
+                    <td className="py-3.5 px-space-md">14.0 mm – 21.0 mm</td>
+                    <td className="py-3.5 px-space-md">750 mm</td>
+                    <td className="py-3.5 px-space-md">440 PIW (75 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">High-tonnage mining belts, cement mills &amp; steel plants</td>
+                  </tr>
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-secondary">Alligator Belt Lacing (#15 - #65)</td>
+                    <td className="py-3.5 px-space-md">Continuous Steel Segment</td>
+                    <td className="py-3.5 px-space-md">1.5 mm – 9.5 mm</td>
+                    <td className="py-3.5 px-space-md">75 mm – 250 mm</td>
+                    <td className="py-3.5 px-space-md">Up to 200 PIW (35 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">Produce conveyors, packaging, agricultural &amp; warehouse logistics</td>
+                  </tr>
+                  <tr className="hover:bg-surface-container-low transition-colors">
+                    <td className="py-3.5 px-space-md font-semibold text-tertiary">Rivet Hinged Fastener (R5 / R6)</td>
+                    <td className="py-3.5 px-space-md">Self-Setting Staggered Rivet</td>
+                    <td className="py-3.5 px-space-md">6.0 mm – 17.0 mm</td>
+                    <td className="py-3.5 px-space-md">250 mm – 450 mm</td>
+                    <td className="py-3.5 px-space-md">Up to 450 PIW (80 kN/m)</td>
+                    <td className="py-3.5 px-space-md font-sans">Portable stackers, mobile screens &amp; surface aggregate lines</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         )}

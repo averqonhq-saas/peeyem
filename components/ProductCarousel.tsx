@@ -1,16 +1,70 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { PRODUCTS, Product } from "@/data/products";
+import { PRODUCTS, Product, COMPANY_INFO } from "@/data/products";
+import { dbService, normalizeImageUrl } from "@/lib/db";
+import { DbProduct } from "@/types/admin";
 import ProductRFQModal from "@/components/products/ProductRFQModal";
+
+function adaptDbProduct(p: DbProduct): Product {
+  const staticMatch = PRODUCTS.find(
+    (sp) => sp.id === p.id || sp.name.toLowerCase() === p.name.toLowerCase()
+  );
+  return {
+    id: p.id,
+    name: p.name,
+    categoryTag: p.category_id || staticMatch?.categoryTag || "Industrial Belting",
+    categoryColor: staticMatch?.categoryColor || "text-amber-500",
+    specTag: p.specifications?.[0]?.value || staticMatch?.specTag || "Heavy Duty Industrial",
+    description: p.description || p.short_description || staticMatch?.description || "",
+    grades:
+      staticMatch?.grades ||
+      (p.specifications && p.specifications.length > 0
+        ? p.specifications.slice(0, 4).map((s) => s.value)
+        : ["Standard Grade"]),
+    specifications:
+      p.specifications && p.specifications.length > 0
+        ? p.specifications
+        : staticMatch?.specifications || [],
+    applications:
+      staticMatch?.applications || ["Material Handling", "Quarry & Mining", "Industrial Processing"],
+    image:
+      normalizeImageUrl(p.image_url) ||
+      staticMatch?.image ||
+      "/images/products/rubber-conveyor-belt.jpg",
+    alt: `${p.name} - Peeyem Traders Coimbatore`,
+    whatsappMessage:
+      staticMatch?.whatsappMessage ||
+      `Hi Peeyem Traders, I am interested in ${p.name} (${p.category_id}). Please share pricing and technical specs.`,
+    detailsLink: staticMatch?.detailsLink || `/products#${p.id}`,
+  };
+}
 
 export default function ProductCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalProduct, setModalProduct] = useState<string>("Rubber Conveyor Belt");
   const [modalApp, setModalApp] = useState<string>("Material Handling");
+
+  useEffect(() => {
+    // Real-Time subscription for products
+    const unsubscribe = dbService.subscribeProducts((list) => {
+      const active = list.filter((p) => p.is_active);
+      if (active.length > 0) {
+        const adaptedList = active.map(adaptDbProduct);
+        setProducts(adaptedList);
+        setSelectedProduct((prev) => {
+          const match = adaptedList.find((p) => p.id === prev.id);
+          return match || adaptedList[0];
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleScroll = (direction: "left" | "right") => {
     const track = trackRef.current;
@@ -152,14 +206,14 @@ export default function ProductCarousel() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => handleOpenEnquiry(selectedProduct.name, selectedProduct.applications[0])}
+                  onClick={() => handleOpenEnquiry(selectedProduct.name, selectedProduct.applications?.[0] || "Material Handling")}
                   className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-sm flex items-center gap-2 active:scale-95"
                 >
                   <span className="material-symbols-outlined text-[18px]">send</span>
                   <span>Send Enquiry</span>
                 </button>
                 <a
-                  href={`https://wa.me/916379485898?text=${encodeURIComponent(selectedProduct.whatsappMessage)}`}
+                  href={`https://wa.me/${COMPANY_INFO.phoneRaw.replace("+", "")}?text=${encodeURIComponent(selectedProduct.whatsappMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm transition-all flex items-center gap-2 active:scale-95"
@@ -180,7 +234,7 @@ export default function ProductCarousel() {
             className="flex items-stretch gap-6 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {PRODUCTS.map((prod) => {
+            {products.map((prod) => {
               const isSelected = selectedProduct.id === prod.id;
               return (
                 <div
@@ -218,16 +272,18 @@ export default function ProductCarousel() {
                       </p>
 
                       {/* Grades Tags */}
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {prod.grades.slice(0, 3).map((g) => (
-                          <span
-                            key={g}
-                            className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold"
-                          >
-                            {g}
-                          </span>
-                        ))}
-                      </div>
+                      {prod.grades && prod.grades.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {prod.grades.slice(0, 3).map((g) => (
+                            <span
+                              key={g}
+                              className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold"
+                            >
+                              {g}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Card Action Buttons */}
@@ -250,7 +306,7 @@ export default function ProductCarousel() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenEnquiry(prod.name, prod.applications[0]);
+                          handleOpenEnquiry(prod.name, prod.applications?.[0] || "Material Handling");
                         }}
                         className="flex-1 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all text-center"
                       >

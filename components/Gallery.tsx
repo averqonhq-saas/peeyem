@@ -8,22 +8,52 @@ import { DbGalleryImage } from "@/types/admin";
 
 const DEFAULT_IMAGES = [
   {
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDgqOYZAdlPsSXp8KRxib9a55ZCWgAEiemhK7uh5ijWHxzXlOav-Mg0yOoE5kNo0biwJvY_Y8XOZiIZxRNCTBJJlN6IbNI_Y2WmnHvQOqZK4F5OfaLPillUb3dsWv5_UcraxLEZCcVffhdSFoVddQqnqf1R-hy9zXRISaU0VjA9iSR2UMe5n5nP5UtZfbsz0hnjCFB0_QJi0vTontyB6GxmAKdvHq8Vf1xWNhafprxP-YgoJaO_fzgFqg",
-    alt: "Chevron Cleated Conveyor Roll Detail",
-    tag: "Stock View",
-    title: "Chevron Roll Assembly",
+    src: "/images/products/rubber-conveyor-belt.jpg",
+    alt: "Heavy Duty Rubber Conveyor Belt Roll on Pallet",
+    tag: "CONVEYOR BELT",
+    title: "Rubber Conveyor Belt",
   },
   {
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkBo8yqVorpCynzioX_BBPHgU0JBhLzroHNbWerJok2IBjlVxe4a19F0hwSjJA_A-u7VEHV7_GNP1j1Z-fag9ZLHgSlcIBTXIvWaE7LyR9c-DXY5JtZoI1MRpj2sW9jev62dt1NU7MZnHWs_B6w-LR6R4el0ls06totDAeYn18QkRVZTWEqH9JtH4qV3ViWwT0nKK3UCamfWnqm4VKDkuBCtKnLRDSIF-b_KlqPOTF_bnwcjzgdyX5kA",
-    alt: "Industrial Rubber Roll Stock in Coimbatore Warehouse",
-    tag: "Warehouse Staging",
-    title: "Industrial Rubber Sheets",
+    src: "/images/products/pu-conveyor-belt.jpg",
+    alt: "Food Grade PU Polyurethane Conveyor Belt",
+    tag: "FOOD GRADE BELT",
+    title: "PU Conveyor Belt",
   },
   {
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCsKPWW63Qi05s9yRq3dC3WVHs1pOGgG0no6Y3MjGLi_56i0E1p8zpaO-7kfsFuv-Yu9neJZLOpXrIh1susAFnE3H20RCCAK3PHgnuxHqsSUbK5IS2q4a-wD3S4tfBzjGn7Ym2wtX8XA39E11B22DsUBsig1bjBhoX4tg-KUhjsgYSqQBbuWbtAQ7M5IoOIYH-xVrt7jPc0EAKyrkYJGotMwTFgZ7OAMseRPhlvdB9xKByme5YgQppGuA",
-    alt: "Continuous Mineral Conveyor Running at Crushing Site",
-    tag: "Operational Site",
-    title: "Quarry Belt Line",
+    src: "/images/products/pvc-conveyor-belt.jpg",
+    alt: "Industrial PVC Conveyor Belt Roll",
+    tag: "LOGISTICS & AGRO",
+    title: "PVC Conveyor Belt",
+  },
+  {
+    src: "/images/products/v-belt.jpg",
+    alt: "Industrial Rubber Transmission V-Belts",
+    tag: "POWER TRANSMISSION",
+    title: "Industrial V-Belt",
+  },
+  {
+    src: "/images/products/cow-mat.jpg",
+    alt: "Heavy Duty Vulcanized Rubber Cow Mats",
+    tag: "RUBBER FLOORING",
+    title: "Vulcanized Cow Mat",
+  },
+  {
+    src: "/images/products/rubber-sheet.jpg",
+    alt: "Industrial Vulcanized Rubber Sheet Rolls",
+    tag: "RUBBER SHEETING",
+    title: "Industrial Rubber Sheet",
+  },
+  {
+    src: "/images/products/conveyor-belt-fasteners.jpg",
+    alt: "Mechanical Conveyor Belt Fasteners and Splicing",
+    tag: "BELT FASTENERS",
+    title: "Conveyor Belt Fasteners",
+  },
+  {
+    src: "/images/products/tarpaulin.jpg",
+    alt: "Heavy Duty Waterproof Industrial Blue Tarpaulin",
+    tag: "PROTECTIVE COVERS",
+    title: "Industrial Tarpaulin",
   },
 ];
 
@@ -38,7 +68,7 @@ export default function Gallery() {
 
       if (active.length > 0) {
         setDisplayImages(
-          active.slice(0, 3).map((g) => ({
+          active.slice(0, 8).map((g) => ({
             src: g.url,
             alt: g.caption,
             tag: g.category.toUpperCase(),
@@ -75,7 +105,7 @@ export default function Gallery() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
           {displayImages.map((item) => (
             <Link
               key={item.title}

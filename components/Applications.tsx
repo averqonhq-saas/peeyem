@@ -111,6 +111,12 @@ const FINDER_PRODUCTS: Record<string, Array<{ name: string; grade: string; image
       image: "/images/products/v-belt.jpg",
       desc: "High-torque transmission belts for jaw crushers, cone crushers, and vibrating screens.",
     },
+    {
+      name: "Conveyor Belt Fasteners",
+      grade: "Bolt Solid Plate & Rivet Fasteners",
+      image: "/images/products/conveyor-belt-fasteners.jpg",
+      desc: "Heavy-duty mechanical belt splicing fasteners for fast on-site emergency repairs and jointing on crusher lines.",
+    },
   ],
   "Cotton Mills": [
     {
@@ -166,6 +172,12 @@ const FINDER_PRODUCTS: Record<string, Array<{ name: string; grade: string; image
       grade: "Anti-Static Smooth Top",
       image: "/images/products/pvc-conveyor-belt.jpg",
       desc: "Low-noise sorting lines, assembly conveyors, and parcel distribution belts.",
+    },
+    {
+      name: "Conveyor Belt Fasteners",
+      grade: "Alligator & Solid Plate Lacing",
+      image: "/images/products/conveyor-belt-fasteners.jpg",
+      desc: "Mechanical belt jointing and hinge fasteners for fast belt replacements and logistics conveyor maintenance.",
     },
   ],
   "Other Applications": [

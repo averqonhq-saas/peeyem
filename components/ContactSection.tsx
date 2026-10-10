@@ -233,7 +233,7 @@ export default function ContactSection() {
                     <input
                       className="w-full px-4 py-3 rounded-lg bg-surface text-on-surface font-body-sm focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-inner border border-outline-variant/20"
                       id="contact-phone"
-                      placeholder="+91 63794 85898"
+                      placeholder="+91 97511 49443"
                       required
                       type="tel"
                       value={formData.phone}

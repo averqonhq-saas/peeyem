@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { COMPANY_INFO } from "@/data/products";
-import { dbService, normalizeImageUrl } from "@/lib/db";
+import { dbService, normalizeImageUrl, INITIAL_PRODUCTS } from "@/lib/db";
 import { DbProduct } from "@/types/admin";
 import ProductRFQModal from "./ProductRFQModal";
 
@@ -14,8 +14,8 @@ interface ProductCatalogGridProps {
 export default function ProductCatalogGrid({
   searchQuery,
 }: ProductCatalogGridProps) {
-  const [products, setProducts] = useState<DbProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<DbProduct[]>(INITIAL_PRODUCTS);
+  const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [modalProduct, setModalProduct] = useState<string | null>(null);
@@ -32,6 +32,20 @@ export default function ProductCatalogGrid({
 
     return () => unsubscribe();
   }, []);
+
+  // Handle URL hash navigation (e.g. /products#belt-fasteners)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash && !loading) {
+      const hashId = window.location.hash.substring(1);
+      const timer = setTimeout(() => {
+        const el = document.getElementById(hashId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, products]);
 
   // Extract unique categories dynamically from active products
   const uniqueCategories = Array.from(new Set(products.map((p) => p.category_id))).filter(Boolean);
@@ -201,6 +215,7 @@ export default function ProductCatalogGrid({
                 return (
                   <div
                     key={prod.id}
+                    id={prod.id === "conveyor-belt-fasteners" ? "belt-fasteners" : prod.id}
                     className="flex flex-col rounded-3xl overflow-hidden bg-white border border-outline-variant/30 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 group hover-lift animate-fade-in-up"
                     style={{ animationDelay: `${Math.min(index * 60, 360)}ms` }}
                   >
