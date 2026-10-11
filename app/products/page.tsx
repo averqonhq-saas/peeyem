@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     "PVC conveyor belt Tamil Nadu",
   ],
   alternates: {
-    canonical: "https://peeyemtraders.com/products",
+    canonical: "https://www.peeyemtraders.com/products",
   },
   openGraph: {
     title: "Industrial Conveyor Belts, Rubber Sheets & Accessories Catalog | Peeyem Traders",
     description:
       "Explore Peeyem Traders complete catalog of industrial conveyor belts, specialized belts, rubber sheets, and mechanical fasteners in Coimbatore, Tamil Nadu.",
-    url: "https://peeyemtraders.com/products",
+    url: "https://www.peeyemtraders.com/products",
     type: "website",
     locale: "en_IN",
     images: [

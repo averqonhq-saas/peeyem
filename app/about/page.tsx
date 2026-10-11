@@ -26,13 +26,13 @@ export const metadata: Metadata = {
     "South Ukkadam conveyor belt supplier",
   ],
   alternates: {
-    canonical: "https://peeyemtraders.com/about",
+    canonical: "https://www.peeyemtraders.com/about",
   },
   openGraph: {
     title: "About Us - Conveyor Belt Suppliers in Tamil Nadu | Peeyem Traders",
     description:
       "Leading conveyor belt suppliers in Tamil Nadu based in South Ukkadam, Coimbatore. Certified industrial conveyor belts, rubber sheets, and accessories.",
-    url: "https://peeyemtraders.com/about",
+    url: "https://www.peeyemtraders.com/about",
     type: "website",
     locale: "en_IN",
     images: [

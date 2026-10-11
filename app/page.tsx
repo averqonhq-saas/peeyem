@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     "Chevron cleated belts Tamil Nadu",
   ],
   alternates: {
-    canonical: "https://peeyemtraders.com",
+    canonical: "https://www.peeyemtraders.com",
   },
   openGraph: {
     title: "Industrial Conveyor Belts in Coimbatore | Peeyem Traders",
     description:
       "Leading conveyor belt suppliers in Tamil Nadu. Heavy-duty multi-ply belts (NN/EP), chevron cleated belts, conveyor accessories, and industrial rubber sheets.",
-    url: "https://peeyemtraders.com",
+    url: "https://www.peeyemtraders.com",
     images: [
       {
         url: "/images/products/rubber-conveyor-belt-hero.jpg",

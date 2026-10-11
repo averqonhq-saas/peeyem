@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     "Industrial material handling products",
   ],
   alternates: {
-    canonical: "https://peeyemtraders.com/contact",
+    canonical: "https://www.peeyemtraders.com/contact",
   },
   openGraph: {
     title: "Contact Peeyem Traders | South Ukkadam, Coimbatore",
     description:
       "Direct contact and RFQ portal for Peeyem Traders, South Ukkadam, Coimbatore. Fast formal quotations for industrial conveyor belts and rubber sheets.",
-    url: "https://peeyemtraders.com/contact",
+    url: "https://www.peeyemtraders.com/contact",
     type: "website",
     locale: "en_IN",
     images: [

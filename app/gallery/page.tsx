@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     "Conveyor belt accessories",
   ],
   alternates: {
-    canonical: "https://peeyemtraders.com/gallery",
+    canonical: "https://www.peeyemtraders.com/gallery",
   },
   openGraph: {
     title: "Industrial Visual Gallery & Operations | Peeyem Traders Coimbatore",
     description:
       "High-resolution operational photography, chevron cleat profiles, and industrial conveyor installations in Coimbatore.",
-    url: "https://peeyemtraders.com/gallery",
+    url: "https://www.peeyemtraders.com/gallery",
     type: "website",
     locale: "en_IN",
     images: [

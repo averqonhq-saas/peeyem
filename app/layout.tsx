@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://peeyemtraders.com"),
+  metadataBase: new URL("https://www.peeyemtraders.com"),
   title: {
     default: "Peeyem Traders | Industrial Conveyor Belts & Rubber Solutions Coimbatore",
     template: "%s | Peeyem Traders",
@@ -51,11 +51,11 @@ export const metadata: Metadata = {
     "Heat Resistant Belts HR SHR",
     "Mechanical Belt Fasteners",
   ],
-  authors: [{ name: "Peeyem Traders", url: "https://peeyemtraders.com" }],
+  authors: [{ name: "Peeyem Traders", url: "https://www.peeyemtraders.com" }],
   creator: "Peeyem Traders",
   publisher: "Peeyem Traders",
   alternates: {
-    canonical: "https://peeyemtraders.com",
+    canonical: "https://www.peeyemtraders.com",
   },
   robots: {
     index: true,
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
       "Supplying heavy-duty industrial conveyor belts, specialized belts, conveyor accessories, and industrial rubber sheets in Coimbatore, Tamil Nadu.",
     type: "website",
     locale: "en_IN",
-    url: "https://peeyemtraders.com",
+    url: "https://www.peeyemtraders.com",
     siteName: "Peeyem Traders",
     images: [
       {

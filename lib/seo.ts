@@ -1,6 +1,6 @@
 import { PRODUCTS, COMPANY_INFO } from "@/data/products";
 
-export const SITE_URL = "https://peeyemtraders.com";
+export const SITE_URL = "https://www.peeyemtraders.com";
 
 export interface BreadcrumbItem {
   name: string;
