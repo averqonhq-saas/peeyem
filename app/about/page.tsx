@@ -8,23 +8,60 @@ import ProductShowcase from "@/components/about/ProductShowcase";
 import AboutCTA from "@/components/about/AboutCTA";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "About Us | Peeyem Traders - Industrial Conveyor Belts & Rubber Sheets Coimbatore",
+  title: "About Us - Conveyor Belt Suppliers in Tamil Nadu",
   description:
-    "Learn about Peeyem Traders, South Ukkadam Coimbatore. We supply certified industrial conveyor belts, rubber products, specialized belts, and conveyor accessories engineered for rugged industrial material-handling.",
+    "Learn about Peeyem Traders, leading conveyor belt suppliers in Tamil Nadu based at South Ukkadam, Coimbatore. Supplying certified industrial conveyor belts, rubber sheets, specialized belts, and accessories.",
   keywords: [
+    "Conveyor belt suppliers in Tamil Nadu",
+    "Industrial conveyor belts in Coimbatore",
     "About Peeyem Traders",
-    "Conveyor Belt Supplier Coimbatore",
-    "Industrial Rubber Sheets Tamil Nadu",
-    "Chevron Cleated Belts Coimbatore",
-    "Material Handling Solutions South Ukkadam",
+    "Industrial rubber sheets Tamil Nadu",
+    "Specialized industrial belts",
+    "Conveyor belt accessories",
+    "Industrial material handling products",
+    "South Ukkadam conveyor belt supplier",
   ],
+  alternates: {
+    canonical: "https://peeyemtraders.com/about",
+  },
+  openGraph: {
+    title: "About Us - Conveyor Belt Suppliers in Tamil Nadu | Peeyem Traders",
+    description:
+      "Leading conveyor belt suppliers in Tamil Nadu based in South Ukkadam, Coimbatore. Certified industrial conveyor belts, rubber sheets, and accessories.",
+    url: "https://peeyemtraders.com/about",
+    type: "website",
+    locale: "en_IN",
+    images: [
+      {
+        url: "/images/products/rubber-conveyor-belt-hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "About Peeyem Traders - Industrial Conveyor Belts Coimbatore",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us - Conveyor Belt Suppliers in Tamil Nadu | Peeyem Traders",
+    description:
+      "Leading conveyor belt suppliers in Tamil Nadu based in South Ukkadam, Coimbatore.",
+    images: ["/images/products/rubber-conveyor-belt-hero.jpg"],
+  },
 };
 
 export default function AboutPage() {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "About Us", url: "/about" },
+  ]);
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
       <Header />
       <main className="w-full pt-16 bg-surface">
         <div className="flex flex-col w-full">

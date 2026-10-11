@@ -19,7 +19,7 @@ export default function ProductFocus() {
           </div>
           <Link
             className="inline-flex items-center gap-1.5 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group font-semibold"
-            href="/#products"
+            href="/products"
           >
             <span>Complete Catalog</span>
             <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">
@@ -55,7 +55,7 @@ export default function ProductFocus() {
               </div>
             </div>
             <Link
-              href="/#products"
+              href="/products#rubber-conveyor-belt"
               className="pt-5 mt-4 flex items-center justify-between text-primary font-label-md text-label-md"
             >
               <span>Explore Category</span>
@@ -90,7 +90,7 @@ export default function ProductFocus() {
               </div>
             </div>
             <Link
-              href="/#products"
+              href="/products#rubber-sheet"
               className="pt-5 mt-4 flex items-center justify-between text-secondary font-label-md text-label-md"
             >
               <span>Explore Category</span>
@@ -125,7 +125,7 @@ export default function ProductFocus() {
               </div>
             </div>
             <Link
-              href="/#products"
+              href="/products#rubber-conveyor-belt"
               className="pt-5 mt-4 flex items-center justify-between text-tertiary font-label-md text-label-md"
             >
               <span>Explore Category</span>
@@ -159,7 +159,7 @@ export default function ProductFocus() {
               </div>
             </div>
             <Link
-              href="/#products"
+              href="/products#belt-fasteners"
               className="pt-5 mt-4 flex items-center justify-between text-primary font-label-md text-label-md"
             >
               <span>Explore Category</span>

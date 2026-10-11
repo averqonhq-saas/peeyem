@@ -70,18 +70,18 @@ export default function Hero() {
             <div className="lg:col-span-6 flex flex-col items-start gap-5 z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-medium tracking-wide text-xs">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" aria-hidden="true" />
-                Industrial Belts for Every Application
+                Industrial Conveyor Belts &amp; Rubber Solutions • Coimbatore
               </div>
 
               <h1
                 className="font-extrabold text-slate-900 tracking-tight leading-tight text-3xl sm:text-4xl lg:text-5xl"
                 style={{ lineHeight: "1.15" }}
               >
-                Industrial Belts Built for Demanding Applications
+                Industrial Conveyor Belts in Coimbatore
               </h1>
 
               <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl">
-                We supply high-quality industrial belts and rubber products for a wide range of industrial and material-handling applications.
+                We supply high-performance industrial conveyor belts, specialized belts, conveyor belt accessories, and abrasion-resistant industrial rubber sheets engineered for heavy material handling applications across Tamil Nadu.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto pt-2">

@@ -2,7 +2,7 @@ import { COMPANY_INFO } from "@/data/products";
 
 export default function DepotServices() {
   return (
-    <section className="w-full bg-surface py-space-xl">
+    <section id="accessories" className="w-full bg-surface py-space-xl">
       <div className="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-space-xl items-center">
           {/* Left Column: Fabrication Details */}

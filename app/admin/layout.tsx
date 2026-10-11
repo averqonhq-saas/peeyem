@@ -384,6 +384,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <span className="material-symbols-outlined text-base text-amber-400">stars</span>
                 <span>Add Review</span>
               </Link>
+              <Link
+                href="/admin/gallery"
+                onClick={() => setFabOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              >
+                <span className="material-symbols-outlined text-base text-purple-400">photo_library</span>
+                <span>Add Gallery Photo</span>
+              </Link>
             </div>
           )}
         </div>
@@ -401,7 +409,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <button
           onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
           className={`flex flex-col items-center justify-center gap-1 w-16 py-1 ${
-            mobileMoreOpen ? "text-[#ff8d28] font-bold" : "text-slate-400 hover:text-slate-200"
+            mobileMoreOpen || isActive("/admin/gallery") || isActive("/admin/media") || isActive("/admin/testimonials") || isActive("/admin/videos") || isActive("/admin/settings")
+              ? "text-[#ff8d28] font-bold"
+              : "text-slate-400 hover:text-slate-200"
           }`}
         >
           <span className="material-symbols-outlined text-[22px]">more_horiz</span>
@@ -425,9 +435,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <Link
+                href="/admin/gallery"
+                onClick={() => setMobileMoreOpen(false)}
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  isActive("/admin/gallery")
+                    ? "bg-[#ff8d28]/15 border-[#ff8d28] text-[#ff8d28]"
+                    : "bg-slate-900 border-slate-800 text-slate-200"
+                }`}
+              >
+                <span className="material-symbols-outlined text-purple-400">photo_library</span>
+                <span className="text-xs font-semibold">Gallery Photos</span>
+              </Link>
+
+              <Link
                 href="/admin/testimonials"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3 text-slate-200"
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  isActive("/admin/testimonials")
+                    ? "bg-[#ff8d28]/15 border-[#ff8d28] text-[#ff8d28]"
+                    : "bg-slate-900 border-slate-800 text-slate-200"
+                }`}
               >
                 <span className="material-symbols-outlined text-amber-400">stars</span>
                 <span className="text-xs font-semibold">Testimonials</span>
@@ -436,7 +463,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 href="/admin/videos"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3 text-slate-200"
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  isActive("/admin/videos")
+                    ? "bg-[#ff8d28]/15 border-[#ff8d28] text-[#ff8d28]"
+                    : "bg-slate-900 border-slate-800 text-slate-200"
+                }`}
               >
                 <span className="material-symbols-outlined text-cyan-400">smart_display</span>
                 <span className="text-xs font-semibold">Videos</span>
@@ -445,7 +476,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 href="/admin/media"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3 text-slate-200"
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  isActive("/admin/media")
+                    ? "bg-[#ff8d28]/15 border-[#ff8d28] text-[#ff8d28]"
+                    : "bg-slate-900 border-slate-800 text-slate-200"
+                }`}
               >
                 <span className="material-symbols-outlined text-teal-400">perm_media</span>
                 <span className="text-xs font-semibold">Media</span>
@@ -454,7 +489,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 href="/admin/settings"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3 text-slate-200"
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  isActive("/admin/settings")
+                    ? "bg-[#ff8d28]/15 border-[#ff8d28] text-[#ff8d28]"
+                    : "bg-slate-900 border-slate-800 text-slate-200"
+                }`}
               >
                 <span className="material-symbols-outlined text-slate-400">settings</span>
                 <span className="text-xs font-semibold">Settings</span>

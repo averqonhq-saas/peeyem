@@ -33,14 +33,14 @@ export default function AboutCTA() {
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
           <Link
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-md text-label-md font-bold shadow-lg hover:bg-tertiary-fixed transition-all group"
-            href="/#contact"
+            href="/contact"
           >
             <span className="material-symbols-outlined text-[20px]">chat</span>
             <span>Contact Us</span>
           </Link>
           <Link
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 text-on-primary font-label-md text-label-md transition-all"
-            href="/#products"
+            href="/products"
           >
             <span className="material-symbols-outlined text-[20px]">list_alt</span>
             <span>View Products</span>

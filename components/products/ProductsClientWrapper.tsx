@@ -5,6 +5,7 @@ import ProductsHero from "./ProductsHero";
 import ProductCatalogGrid from "./ProductCatalogGrid";
 import FeaturedProduct from "@/components/FeaturedProduct";
 import Applications from "@/components/Applications";
+import EngineeringMatrix from "./EngineeringMatrix";
 import DepotServices from "./DepotServices";
 import ProductsCTA from "./ProductsCTA";
 import ProductRFQModal from "./ProductRFQModal";
@@ -39,6 +40,7 @@ export default function ProductsClientWrapper() {
       <ProductCatalogGrid searchQuery={searchQuery} />
       <FeaturedProduct />
       <Applications />
+      <EngineeringMatrix />
       <DepotServices />
       <ProductsCTA onRequestQuote={() => handleOpenEnquiry("Custom Engineered Belt", "Industrial Material Handling")} />
 

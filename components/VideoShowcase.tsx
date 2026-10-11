@@ -150,7 +150,7 @@ export default function VideoShowcase() {
               key={currentVideo.id}
               className="object-cover filter brightness-[0.72] transition-transform duration-700 hover:scale-105"
               sizes="(max-width: 1280px) 100vw, 1280px"
-              priority
+              loading="lazy"
             />
 
             {/* Gradient Overlays */}

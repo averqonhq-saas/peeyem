@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import JsonLd from "@/components/seo/JsonLd";
+import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
+import {
+  getWebsiteSchema,
+  getOrganizationSchema,
+  getLocalBusinessSchema,
+} from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,27 +32,65 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://peeyemtraders.com"),
-  title: "Peeyem Traders | Industrial Conveyor Belts & Rubber Solutions Coimbatore",
+  title: {
+    default: "Peeyem Traders | Industrial Conveyor Belts & Rubber Solutions Coimbatore",
+    template: "%s | Peeyem Traders",
+  },
   description:
-    "Heavy-duty multi-ply belting (NN/EP), chevron cleated solutions, and abrasion-resistant industrial rubber sheets engineered for high-tonnage mining, aggregate, and manufacturing operations. Based in Coimbatore, Tamil Nadu.",
+    "Supplying heavy-duty industrial conveyor belts, specialized belts, conveyor accessories, and industrial rubber sheets in Coimbatore, Tamil Nadu. Direct stock, fast dispatch.",
   keywords: [
-    "Conveyor Belts Coimbatore",
+    "Industrial conveyor belts in Coimbatore",
+    "Conveyor belt suppliers in Tamil Nadu",
+    "Industrial rubber sheets",
+    "Specialized industrial belts",
+    "Conveyor belt accessories",
+    "Industrial material handling products",
     "Chevron Cleated Belts",
-    "Industrial Rubber Sheets",
     "Multi-ply Conveyor Belts NN EP",
     "Peeyem Traders South Ukkadam",
     "Heat Resistant Belts HR SHR",
     "Mechanical Belt Fasteners",
   ],
-  authors: [{ name: "Peeyem Traders" }],
-  robots: { index: true, follow: true },
+  authors: [{ name: "Peeyem Traders", url: "https://peeyemtraders.com" }],
+  creator: "Peeyem Traders",
+  publisher: "Peeyem Traders",
+  alternates: {
+    canonical: "https://peeyemtraders.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
-    title: "Peeyem Traders | Industrial Conveyor & Rubber Solutions",
+    title: "Peeyem Traders | Industrial Conveyor Belts & Rubber Solutions Coimbatore",
     description:
-      "Continuous Power. Precision Handling. Heavy-duty multi-ply belting, chevron cleated solutions, and abrasion-resistant industrial rubber sheets.",
+      "Supplying heavy-duty industrial conveyor belts, specialized belts, conveyor accessories, and industrial rubber sheets in Coimbatore, Tamil Nadu.",
     type: "website",
     locale: "en_IN",
+    url: "https://peeyemtraders.com",
     siteName: "Peeyem Traders",
+    images: [
+      {
+        url: "/images/products/rubber-conveyor-belt-hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Peeyem Traders Industrial Conveyor Belts and Rubber Solutions Coimbatore",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Peeyem Traders | Industrial Conveyor Belts & Rubber Solutions Coimbatore",
+    description:
+      "Supplying heavy-duty industrial conveyor belts, specialized belts, conveyor accessories, and industrial rubber sheets in Coimbatore, Tamil Nadu.",
+    images: ["/images/products/rubber-conveyor-belt-hero.jpg"],
   },
   icons: {
     icon: [
@@ -54,6 +99,9 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
 };
 
 export default function RootLayout({
@@ -61,6 +109,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const globalSchemas = [
+    getWebsiteSchema(),
+    getOrganizationSchema(),
+    getLocalBusinessSchema(),
+  ];
+
   return (
     <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <head>
@@ -75,8 +129,10 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,-50..200&display=swap"
         />
+        <JsonLd data={globalSchemas} />
       </head>
       <body className="bg-background font-body-md text-body-md text-on-surface antialiased">
+        <GoogleAnalytics />
         {children}
       </body>
     </html>

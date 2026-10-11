@@ -143,7 +143,7 @@ export default function ProductCarousel() {
                 src={selectedProduct.image}
                 alt={selectedProduct.alt}
                 fill
-                priority
+                loading="lazy"
                 className="object-cover transition-opacity duration-300"
                 sizes="(max-width: 768px) 100vw, 600px"
               />

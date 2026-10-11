@@ -37,8 +37,18 @@ export default function ProductCatalogGrid({
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash && !loading) {
       const hashId = window.location.hash.substring(1);
+      const aliasMap: Record<string, string> = {
+        "rubber-sheets": "rubber-sheet",
+        "chevron-belts": "rubber-conveyor-belt",
+        "rubber-conveyor-section": "rubber-conveyor-belt",
+        "belt-fasteners": "belt-fasteners",
+        "conveyor-belt-fasteners": "belt-fasteners",
+        accessories: "accessories",
+        specifications: "specifications",
+      };
+      const targetId = aliasMap[hashId] || hashId;
       const timer = setTimeout(() => {
-        const el = document.getElementById(hashId);
+        const el = document.getElementById(targetId) || document.getElementById(hashId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
         }
@@ -227,7 +237,7 @@ export default function ProductCatalogGrid({
                       {normalizeImageUrl(prod.image_url) ? (
                         <Image
                           src={normalizeImageUrl(prod.image_url)}
-                          alt={prod.name}
+                          alt={`${prod.name} - ${prod.category_id} | Peeyem Traders Coimbatore`}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -366,7 +376,7 @@ export default function ProductCatalogGrid({
                               {normalizeImageUrl(prod.image_url) ? (
                                 <Image
                                   src={normalizeImageUrl(prod.image_url)}
-                                  alt={prod.name}
+                                  alt={`${prod.name} - ${prod.category_id} | Peeyem Traders Coimbatore`}
                                   fill
                                   sizes="56px"
                                   className="object-cover"

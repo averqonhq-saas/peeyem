@@ -6,23 +6,59 @@ import DepotLocationSection from "@/components/contact/DepotLocationSection";
 import ContactCTA from "@/components/contact/ContactCTA";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Contact Peeyem Traders | Coimbatore Heavy Conveyor Belting & Rubber Sheets",
+  title: "Contact Us - South Ukkadam, Coimbatore",
   description:
-    "Direct contact and RFQ portal for Peeyem Traders, South Ukkadam Coimbatore. Submit your belt specifications, tensile ratings, or rubber sheet dimensions for rapid 2-hour formal quotations.",
+    "Direct contact and RFQ portal for Peeyem Traders, South Ukkadam, Coimbatore. Submit your conveyor belt specifications, tensile ratings, or rubber sheet dimensions for rapid formal quotations.",
   keywords: [
     "Contact Peeyem Traders",
-    "Conveyor Belt RFQ Coimbatore",
-    "Peeyem Traders South Ukkadam Phone",
-    "Rubber Sheet Supplier Address Coimbatore",
-    "Industrial Conveyor Belt Price Quote Tamil Nadu",
+    "Conveyor belt supplier Coimbatore phone",
+    "Peeyem Traders South Ukkadam address",
+    "Conveyor belt quotation Tamil Nadu",
+    "Industrial rubber sheet enquiry Coimbatore",
+    "Conveyor belt suppliers in Tamil Nadu",
+    "Industrial material handling products",
   ],
+  alternates: {
+    canonical: "https://peeyemtraders.com/contact",
+  },
+  openGraph: {
+    title: "Contact Peeyem Traders | South Ukkadam, Coimbatore",
+    description:
+      "Direct contact and RFQ portal for Peeyem Traders, South Ukkadam, Coimbatore. Fast formal quotations for industrial conveyor belts and rubber sheets.",
+    url: "https://peeyemtraders.com/contact",
+    type: "website",
+    locale: "en_IN",
+    images: [
+      {
+        url: "/images/products/rubber-conveyor-belt-hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Contact Peeyem Traders South Ukkadam Coimbatore",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Peeyem Traders | South Ukkadam, Coimbatore",
+    description:
+      "Direct contact and RFQ portal for Peeyem Traders, South Ukkadam, Coimbatore.",
+    images: ["/images/products/rubber-conveyor-belt-hero.jpg"],
+  },
 };
 
 export default function ContactPage() {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Contact Us", url: "/contact" },
+  ]);
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
       <Header />
       <main className="w-full pt-16 bg-surface">
         <div className="flex flex-col w-full">

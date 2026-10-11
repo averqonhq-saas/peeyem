@@ -85,7 +85,7 @@ export default function ProductShowcase() {
                 </div>
                 <Link
                   className={`inline-flex items-center gap-2 font-label-md text-label-md font-semibold ${item.linkColor} transition-colors`}
-                  href="/#products"
+                  href="/products"
                 >
                   <span>View Product Details</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -99,7 +99,7 @@ export default function ProductShowcase() {
         <div className="flex justify-center pt-4">
           <Link
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-md hover:bg-primary-container transition-all"
-            href="/#products"
+            href="/products"
           >
             <span>View All Products &amp; Specifications</span>
             <span className="material-symbols-outlined text-[20px]">grid_view</span>

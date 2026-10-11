@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrustStrip from "@/components/TrustStrip";
@@ -11,10 +12,50 @@ import CTASection from "@/components/CTASection";
 import ContactSection from "@/components/ContactSection";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Industrial Conveyor Belts in Coimbatore | Peeyem Traders",
+  description:
+    "Leading conveyor belt suppliers in Tamil Nadu. Peeyem Traders supplies heavy-duty multi-ply belts (NN/EP), chevron cleated belts, conveyor accessories, and industrial rubber sheets in South Ukkadam, Coimbatore.",
+  keywords: [
+    "Industrial conveyor belts in Coimbatore",
+    "Conveyor belt suppliers in Tamil Nadu",
+    "Industrial rubber sheets",
+    "Specialized industrial belts",
+    "Conveyor belt accessories",
+    "Industrial material handling products",
+    "Heavy duty conveyor belts Coimbatore",
+    "Chevron cleated belts Tamil Nadu",
+  ],
+  alternates: {
+    canonical: "https://peeyemtraders.com",
+  },
+  openGraph: {
+    title: "Industrial Conveyor Belts in Coimbatore | Peeyem Traders",
+    description:
+      "Leading conveyor belt suppliers in Tamil Nadu. Heavy-duty multi-ply belts (NN/EP), chevron cleated belts, conveyor accessories, and industrial rubber sheets.",
+    url: "https://peeyemtraders.com",
+    images: [
+      {
+        url: "/images/products/rubber-conveyor-belt-hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Industrial Conveyor Belts in Coimbatore - Peeyem Traders",
+      },
+    ],
+  },
+};
 
 export default function Home() {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Home", url: "/" },
+  ]);
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
       <Header />
       <main className="w-full pt-16 bg-surface">
         <div className="flex flex-col w-full">

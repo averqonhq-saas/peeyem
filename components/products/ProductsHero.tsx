@@ -55,15 +55,15 @@ export default function ProductsHero({
             <div className="lg:col-span-7 flex flex-col gap-5">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200 w-fit text-xs font-bold tracking-wide">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                Industrial Belts for Every Application
+                Heavy Conveyor Belting &amp; Rubber Solutions • Coimbatore
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                Industrial Belts Built for Demanding Applications
+                Industrial Conveyor Belts &amp; Rubber Sheets Catalog
               </h1>
 
               <p className="text-slate-600 text-base leading-relaxed max-w-2xl">
-                We supply high-quality industrial belts and rubber products for a wide range of industrial and material-handling applications.
+                Browse our comprehensive range of heavy-duty multi-ply rubber conveyor belts, food-grade PU belts, anti-static PVC belts, high-torque V-belts, conveyor belt accessories, and industrial rubber sheets stocked at our South Ukkadam depot.
               </p>
 
               {/* Action Buttons */}

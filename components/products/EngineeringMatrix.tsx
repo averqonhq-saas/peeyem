@@ -6,7 +6,7 @@ export default function EngineeringMatrix() {
   const [activeTab, setActiveTab] = useState<"grades" | "pulleys" | "chevron" | "fasteners">("grades");
 
   return (
-    <section className="w-full bg-surface-container-low py-space-xl">
+    <section id="specifications" className="w-full bg-surface-container-low py-space-xl">
       <div className="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin">
         <div className="mb-space-lg">
           <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">

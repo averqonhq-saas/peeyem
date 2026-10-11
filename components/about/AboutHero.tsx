@@ -62,8 +62,8 @@ export default function AboutHero() {
             </div>
 
             <h1 className="font-headline-lg text-headline-lg lg:text-display text-on-surface tracking-tight leading-[1.15]">
-              Reliable Industrial Solutions <br className="hidden sm:inline" />
-              <span className="text-primary">for Your Business</span>
+              Conveyor Belt Suppliers in Tamil Nadu <br className="hidden sm:inline" />
+              <span className="text-primary">&amp; Industrial Solutions</span>
             </h1>
 
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl leading-relaxed">
@@ -73,7 +73,7 @@ export default function AboutHero() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-md hover:bg-primary-container transition-all group"
-                href="/#products"
+                href="/products"
               >
                 <span>Explore Products</span>
                 <span className="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform">
@@ -82,7 +82,7 @@ export default function AboutHero() {
               </Link>
               <Link
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container transition-all"
-                href="/#contact"
+                href="/contact"
               >
                 <span className="material-symbols-outlined text-[18px]">engineering</span>
                 <span>Technical Consultation</span>
