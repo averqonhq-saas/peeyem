@@ -262,7 +262,7 @@ function ProductsContent() {
 
         <button
           onClick={openAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#ff8d28] hover:bg-[#e66c00] text-slate-950 font-bold text-xs shadow-lg shadow-[#ff8d28]/20 transition-all hover:scale-[1.02] self-start sm:self-auto"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#ff8d28] hover:bg-[#e66c00] text-slate-950 font-bold text-xs shadow-lg shadow-[#ff8d28]/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
         >
           <span className="material-symbols-outlined text-base">add</span>
           <span>Add New Product</span>
@@ -270,7 +270,7 @@ function ProductsContent() {
       </div>
 
       {/* Search and Filters */}
-      <div className="p-4 rounded-xl bg-[#0e1720] border border-slate-800 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="p-3.5 sm:p-4 rounded-xl bg-[#0e1720] border border-slate-800 flex flex-col md:flex-row gap-2.5 sm:gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
             search
@@ -280,15 +280,15 @@ function ProductsContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search products by name, grade, specification..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
+            className="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
           />
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-[#ff8d28]"
+            className="flex-1 md:flex-none px-3 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-[#ff8d28]"
           >
             <option value="ALL">All Categories ({products.length})</option>
             {DEFAULT_CATEGORIES.map((cat) => (
@@ -300,7 +300,7 @@ function ProductsContent() {
 
           <button
             onClick={() => setFilterFeatured(filterFeatured === true ? null : true)}
-            className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border ${
+            className={`px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border shrink-0 ${
               filterFeatured === true
                 ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                 : "bg-slate-900 text-slate-400 border-slate-700/80 hover:text-slate-200"
@@ -312,7 +312,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      {/* Products Table */}
+      {/* Products Display (Responsive Mobile Cards + Desktop Table) */}
       <div className="rounded-2xl bg-[#0e1720] border border-slate-800 overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-12 text-center text-slate-500 text-sm">Synchronizing products...</div>
@@ -322,131 +322,254 @@ function ProductsContent() {
             <span>No products found matching your filter criteria.</span>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-400 font-bold border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4 w-12 text-center">#</th>
-                  <th className="py-3 px-4 w-16">Image</th>
-                  <th className="py-3 px-4">Product Details</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Price / Range</th>
-                  <th className="py-3 px-4 text-center">Featured</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3 px-4 font-mono text-xs text-slate-400 text-center">
-                      {p.display_order}
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-800 overflow-hidden relative shrink-0">
-                        {normalizeImageUrl(p.image_url) ? (
-                          <Image
-                            src={normalizeImageUrl(p.image_url)}
-                            alt={p.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-slate-600">
-                            <span className="material-symbols-outlined text-base">image</span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-4 max-w-xs">
-                      <div className="font-bold text-white text-sm">{p.name}</div>
-                      <div className="text-xs text-slate-400 line-clamp-1 mt-0.5">
-                        {p.short_description || "No description provided."}
-                      </div>
-                      {p.specifications && p.specifications.length > 0 && (
-                        <div className="flex gap-1 flex-wrap mt-1">
-                          {p.specifications.slice(0, 2).map((s, idx) => (
-                            <span
-                              key={idx}
-                              className="text-[10px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800"
-                            >
-                              {s.key}: {s.value}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-teal-950/60 text-teal-300 border border-teal-800/40">
+          <>
+            {/* ----------------- MOBILE CARD VIEW (md:hidden) ----------------- */}
+            <div className="md:hidden divide-y divide-slate-800/80">
+              {filteredProducts.map((p) => (
+                <div key={p.id} className="p-4 space-y-3 bg-[#0e1720] hover:bg-slate-900/50 transition-colors">
+                  {/* Top Bar: Order, Category, Featured, Status */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-6 h-6 rounded-md bg-slate-800 text-slate-400 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">
+                        #{p.display_order}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-950/80 text-teal-300 border border-teal-800/60 truncate max-w-[170px] whitespace-nowrap">
                         {p.category_id}
                       </span>
-                    </td>
+                    </div>
 
-                    <td className="py-3 px-4 font-mono text-xs text-slate-200">
-                      {p.price_range || "On Request"}
-                    </td>
-
-                    <td className="py-3 px-4 text-center">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Featured Star Toggle */}
                       <button
                         onClick={() => toggleFeatured(p)}
-                        className={`p-1 rounded-full transition-colors ${
-                          p.is_featured
-                            ? "text-amber-400 hover:text-amber-300"
-                            : "text-slate-600 hover:text-slate-400"
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          p.is_featured ? "text-amber-400 bg-amber-400/15" : "text-slate-600 hover:text-slate-400"
                         }`}
                         title={p.is_featured ? "Featured on Home" : "Click to feature"}
                       >
-                        <span className="material-symbols-outlined text-lg">
+                        <span className="material-symbols-outlined text-lg leading-none">
                           {p.is_featured ? "star" : "star_border"}
                         </span>
                       </button>
-                    </td>
 
-                    <td className="py-3 px-4 text-center">
+                      {/* Active Status Badge */}
                       <button
                         onClick={() => toggleActive(p)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-colors ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${
                           p.is_active
                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                             : "bg-slate-800 text-slate-400 border border-slate-700"
                         }`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            p.is_active ? "bg-emerald-400" : "bg-slate-500"
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${p.is_active ? "bg-emerald-400" : "bg-slate-500"}`}
                         ></span>
                         <span>{p.is_active ? "Active" : "Inactive"}</span>
                       </button>
-                    </td>
+                    </div>
+                  </div>
 
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => openEditModal(p)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                          title="Edit Product"
-                        >
-                          <span className="material-symbols-outlined text-base">edit</span>
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(p.id)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
-                          title="Delete Product"
-                        >
-                          <span className="material-symbols-outlined text-base">delete</span>
-                        </button>
+                  {/* Main Product Info: Image + Details */}
+                  <div className="flex gap-3.5 items-start">
+                    <div className="w-20 h-20 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden relative shrink-0 shadow-inner">
+                      {normalizeImageUrl(p.image_url) ? (
+                        <Image
+                          src={normalizeImageUrl(p.image_url)}
+                          alt={p.name}
+                          fill
+                          sizes="80px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-600">
+                          <span className="material-symbols-outlined text-2xl">image</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-white text-sm leading-snug line-clamp-2">{p.name}</h3>
+                      <div className="text-xs text-[#ff8d28] font-mono font-bold mt-1">
+                        {p.price_range || "Price on Request"}
                       </div>
-                    </td>
+                      {p.short_description && (
+                        <p className="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+                          {p.short_description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Specifications Badges */}
+                  {p.specifications && p.specifications.length > 0 && (
+                    <div className="flex gap-1.5 flex-wrap pt-0.5">
+                      {p.specifications.slice(0, 3).map((s, idx) => (
+                        <div
+                          key={idx}
+                          className="text-[10px] bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded-md border border-slate-800 max-w-full truncate"
+                        >
+                          <span className="text-slate-400 font-medium">{s.key}: </span>
+                          <span className="font-semibold text-slate-200">{s.value}</span>
+                        </div>
+                      ))}
+                      {p.specifications.length > 3 && (
+                        <span className="text-[10px] text-slate-500 self-center">
+                          +{p.specifications.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Card Actions Bar */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/60">
+                    <button
+                      onClick={() => openEditModal(p)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700/80 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-base text-[#ff8d28]">edit</span>
+                      <span>Edit Product</span>
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteConfirmId(p.id)}
+                      className="inline-flex items-center justify-center p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                      title="Delete Product"
+                      aria-label="Delete Product"
+                    >
+                      <span className="material-symbols-outlined text-base">delete</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* ----------------- DESKTOP TABLE VIEW (hidden md:block) ----------------- */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-300">
+                <thead className="bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-400 font-bold border-b border-slate-800">
+                  <tr>
+                    <th className="py-3 px-4 w-12 text-center">#</th>
+                    <th className="py-3 px-4 w-16">Image</th>
+                    <th className="py-3 px-4">Product Details</th>
+                    <th className="py-3 px-4">Category</th>
+                    <th className="py-3 px-4">Price / Range</th>
+                    <th className="py-3 px-4 text-center">Featured</th>
+                    <th className="py-3 px-4 text-center">Status</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-800/80">
+                  {filteredProducts.map((p) => (
+                    <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="py-3 px-4 font-mono text-xs text-slate-400 text-center">
+                        {p.display_order}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-800 overflow-hidden relative shrink-0">
+                          {normalizeImageUrl(p.image_url) ? (
+                            <Image
+                              src={normalizeImageUrl(p.image_url)}
+                              alt={p.name}
+                              fill
+                              sizes="48px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-600">
+                              <span className="material-symbols-outlined text-base">image</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-4 max-w-xs">
+                        <div className="font-bold text-white text-sm">{p.name}</div>
+                        <div className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+                          {p.short_description || "No description provided."}
+                        </div>
+                        {p.specifications && p.specifications.length > 0 && (
+                          <div className="flex gap-1 flex-wrap mt-1">
+                            {p.specifications.slice(0, 2).map((s, idx) => (
+                              <span
+                                key={idx}
+                                className="text-[10px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800 whitespace-nowrap"
+                              >
+                                {s.key}: {s.value}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-950/60 text-teal-300 border border-teal-800/40 whitespace-nowrap">
+                          {p.category_id}
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-4 font-mono text-xs text-slate-200 whitespace-nowrap">
+                        {p.price_range || "On Request"}
+                      </td>
+
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => toggleFeatured(p)}
+                          className={`p-1 rounded-full transition-colors ${
+                            p.is_featured
+                              ? "text-amber-400 hover:text-amber-300"
+                              : "text-slate-600 hover:text-slate-400"
+                          }`}
+                          title={p.is_featured ? "Featured on Home" : "Click to feature"}
+                        >
+                          <span className="material-symbols-outlined text-lg">
+                            {p.is_featured ? "star" : "star_border"}
+                          </span>
+                        </button>
+                      </td>
+
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => toggleActive(p)}
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-colors whitespace-nowrap ${
+                            p.is_active
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                              : "bg-slate-800 text-slate-400 border border-slate-700"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              p.is_active ? "bg-emerald-400" : "bg-slate-500"
+                            }`}
+                          ></span>
+                          <span>{p.is_active ? "Active" : "Inactive"}</span>
+                        </button>
+                      </td>
+
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => openEditModal(p)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                            title="Edit Product"
+                          >
+                            <span className="material-symbols-outlined text-base">edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(p.id)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
+                            title="Delete Product"
+                          >
+                            <span className="material-symbols-outlined text-base">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
