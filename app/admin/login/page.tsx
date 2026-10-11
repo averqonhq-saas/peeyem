@@ -5,8 +5,8 @@ import Link from "next/link";
 import { loginAdmin, loginWithGoogle, isAdminAuthenticated, ALLOWED_ADMIN_EMAILS } from "@/lib/auth";
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("peeyem@admin2026");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,28 +39,22 @@ export default function AdminLoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    const userToTry = username.trim() || "admin";
-    const passToTry = password.trim() || "peeyem@admin2026";
+    const userToTry = username.trim();
+    const passToTry = password.trim();
+
+    if (!userToTry || !passToTry) {
+      setError("Please enter both username and password");
+      return;
+    }
+
+    setLoading(true);
 
     const result = loginAdmin(userToTry, passToTry);
     if (result.success) {
       window.location.href = "/admin";
     } else {
       setError(result.error || "Authentication failed");
-      setLoading(false);
-    }
-  };
-
-  const handleQuickLogin = () => {
-    setError("");
-    setLoading(true);
-    const result = loginAdmin("admin", "peeyem@admin2026");
-    if (result.success) {
-      window.location.href = "/admin";
-    } else {
-      setError(result.error || "Login failed");
       setLoading(false);
     }
   };
@@ -92,17 +86,6 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        {/* 1-Click Fast Login Button */}
-        <button
-          type="button"
-          onClick={handleQuickLogin}
-          disabled={loading || googleLoading}
-          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#ff8d28] to-[#e66c00] hover:from-[#ff993e] hover:to-[#f07400] text-slate-950 font-bold text-sm shadow-xl shadow-[#ff8d28]/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-lg">bolt</span>
-          <span>{loading ? "Logging In..." : "1-Click Direct Admin Access"}</span>
-        </button>
-
         {/* Password Credentials Form */}
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div>
@@ -118,7 +101,7 @@ export default function AdminLoginPage() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin or peeyemtraders16@gmail.com"
+                placeholder="Enter username or admin email"
                 className="w-full pl-9 pr-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
               />
             </div>
@@ -137,7 +120,7 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
+                placeholder="Enter password"
                 className="w-full pl-9 pr-10 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#ff8d28]"
               />
               <button
@@ -155,9 +138,10 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading || googleLoading}
-            className="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#ff8d28] to-[#e66c00] hover:from-[#ff993e] hover:to-[#f07400] text-slate-950 font-bold text-sm shadow-xl shadow-[#ff8d28]/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer"
           >
-            {loading ? "Authenticating..." : "Sign In with Credentials"}
+            <span className="material-symbols-outlined text-lg">lock_open</span>
+            <span>{loading ? "Authenticating..." : "Sign In with Credentials"}</span>
           </button>
         </form>
 

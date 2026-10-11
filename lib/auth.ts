@@ -148,7 +148,7 @@ export function loginAdmin(user: string, pass: string): { success: boolean; erro
     return { success: true };
   }
 
-  return { success: false, error: "Invalid username or password. Default is username: admin, password: peeyem@admin2026" };
+  return { success: false, error: "Invalid username or password" };
 }
 
 export async function logoutAdmin(): Promise<void> {
