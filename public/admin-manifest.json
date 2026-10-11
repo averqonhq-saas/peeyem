@@ -1,0 +1,72 @@
+{
+  "id": "/admin",
+  "name": "Peeyem Traders Admin",
+  "short_name": "PT Admin",
+  "description": "Administrative, Inventory & Operations Portal for Peeyem Traders Coimbatore",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070c12",
+  "theme_color": "#ff8d28",
+  "dir": "ltr",
+  "lang": "en-IN",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Products Catalog",
+      "short_name": "Products",
+      "description": "Manage Conveyor Belts & Rubber Sheets catalog",
+      "url": "/admin/products",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Customer Enquiries",
+      "short_name": "Enquiries",
+      "description": "View incoming customer enquiries and RFQs",
+      "url": "/admin/enquiries",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Media Library",
+      "short_name": "Media",
+      "description": "Upload and manage photos and assets",
+      "url": "/admin/media",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Gallery Photos",
+      "short_name": "Gallery",
+      "description": "Manage industrial operation photos",
+      "url": "/admin/gallery",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

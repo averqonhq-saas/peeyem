@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { isAdminAuthenticated, logoutAdmin, getAdminUser, AdminUser } from "@/lib/auth";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { getCloudinaryStatus } from "@/lib/cloudinary";
+import PwaInstallPrompt from "@/components/admin/PwaInstallPrompt";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,9 +37,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setCheckingAuth(false);
   }, [pathname, isLoginPage, router]);
 
-  // If login page, render without admin navigation frame
+  // If login page, render with PWA manifest headers
   if (isLoginPage) {
-    return <>{children}</>;
+    return (
+      <>
+        <link rel="manifest" href="/admin-manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="theme-color" content="#ff8d28" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="PT Admin" />
+        {children}
+      </>
+    );
   }
 
   // Prevent flash of admin dashboard before auth verification
@@ -62,6 +74,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-[#090f15] text-slate-100 flex flex-col md:flex-row antialiased">
+      {/* PWA Manifest & App Metatags */}
+      <link rel="manifest" href="/admin-manifest.json" />
+      <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+      <meta name="theme-color" content="#ff8d28" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta name="apple-mobile-web-app-title" content="PT Admin" />
+
       {/* ================= DESKTOP SIDEBAR ================= */}
       <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-[#0e1720] border-r border-slate-800/80 shrink-0 sticky top-0 h-screen select-none z-30">
         {/* Brand Header */}
@@ -232,6 +253,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </div>
 
+        {/* PWA Install Action */}
+        <div className="px-3 pb-3">
+          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#ff8d28] text-lg">phone_android</span>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-white leading-tight">Admin PWA</span>
+                <span className="text-[9px] text-slate-400">Install to device</span>
+              </div>
+            </div>
+            <PwaInstallPrompt />
+          </div>
+        </div>
+
         {/* Sidebar Footer with Logout & Website Link */}
         <div className="p-3 border-t border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
           <Link
@@ -273,6 +308,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden sm:block">
+              <PwaInstallPrompt />
+            </div>
+
             <Link
               href="/"
               target="_blank"
@@ -431,6 +470,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
+            </div>
+
+            {/* Install PWA Prompt in Mobile Drawer */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800/90 border border-slate-700/80 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#ff8d28]/20 text-[#ff8d28] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-lg">install_mobile</span>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white">Install Admin App</div>
+                  <div className="text-[10px] text-slate-400">Direct standalone home screen app</div>
+                </div>
+              </div>
+              <PwaInstallPrompt />
             </div>
 
             <div className="grid grid-cols-2 gap-3">

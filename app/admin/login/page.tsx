@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { loginAdmin, loginWithGoogle, isAdminAuthenticated, ALLOWED_ADMIN_EMAILS } from "@/lib/auth";
+import PwaInstallPrompt from "@/components/admin/PwaInstallPrompt";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -176,8 +177,17 @@ export default function AdminLoginPage() {
           </button>
         </div>
 
+        {/* PWA Mobile & Desktop Install Prompt */}
+        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-white">Peeyem Admin App</span>
+            <span className="text-[9px] text-slate-400">Install for 1-tap launcher access</span>
+          </div>
+          <PwaInstallPrompt />
+        </div>
+
         {/* Return to website */}
-        <div className="pt-2 text-center">
+        <div className="pt-1 text-center">
           <Link
             href="/"
             className="text-xs text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1"
