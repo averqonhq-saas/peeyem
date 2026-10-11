@@ -8,6 +8,7 @@ import { isAdminAuthenticated, logoutAdmin, getAdminUser, AdminUser } from "@/li
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { getCloudinaryStatus } from "@/lib/cloudinary";
 import PwaInstallPrompt from "@/components/admin/PwaInstallPrompt";
+import EnquiryNotificationManager from "@/components/admin/EnquiryNotificationManager";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -308,6 +309,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            <EnquiryNotificationManager />
+
             <div className="hidden sm:block">
               <PwaInstallPrompt />
             </div>

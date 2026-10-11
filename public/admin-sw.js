@@ -1,5 +1,5 @@
-// Peeyem Traders Admin Service Worker
-const CACHE_NAME = "pt-admin-v1.0.0";
+// Peeyem Traders Admin Service Worker with Mobile Push & Enquiry Notifications
+const CACHE_NAME = "pt-admin-v1.1.0";
 
 const PRECACHE_ASSETS = [
   "/admin/login",
@@ -40,10 +40,106 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch Strategy:
-// - Skip API, Firebase, and non-GET requests
-// - For /admin pages: Network-first with cache fallback
-// - For static assets (images, fonts, scripts): Stale-while-revalidate
+// -------------------------------------------------------------
+// PUSH & SYSTEM NOTIFICATIONS FOR NEW CUSTOMER ENQUIRIES
+// -------------------------------------------------------------
+
+// Web Push event (triggered when server or FCM sends a push notification)
+self.addEventListener("push", (event) => {
+  let data = {
+    title: "🔔 New Customer Enquiry!",
+    body: "A new industrial quotation request was received on Peeyem Traders.",
+    url: "/admin/enquiries",
+  };
+
+  if (event.data) {
+    try {
+      data = { ...data, ...event.data.json() };
+    } catch {
+      data.body = event.data.text() || data.body;
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: "/icons/icon-192x192.png",
+    badge: "/icons/icon-192x192.png",
+    vibrate: [200, 100, 200, 100, 200],
+    tag: data.tag || `peeyem-enquiry-${Date.now()}`,
+    renotify: true,
+    requireInteraction: true,
+    data: {
+      url: data.url || "/admin/enquiries",
+      enquiryId: data.enquiryId,
+    },
+    actions: [
+      { action: "view", title: "View Enquiry" },
+      { action: "close", title: "Dismiss" },
+    ],
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+// Client PostMessage handler: App can ask SW to display native system notification
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "TRIGGER_ENQUIRY_NOTIFICATION") {
+    const { title, body, url, tag, enquiryId } = event.data.payload || {};
+    const options = {
+      body: body || "A customer submitted an enquiry on the website.",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-192x192.png",
+      vibrate: [300, 150, 300, 150, 300],
+      tag: tag || `peeyem-enquiry-${enquiryId || Date.now()}`,
+      renotify: true,
+      requireInteraction: true,
+      data: {
+        url: url || "/admin/enquiries",
+        enquiryId,
+      },
+      actions: [
+        { action: "view", title: "Open Enquiry" },
+        { action: "close", title: "Dismiss" },
+      ],
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(title || "🔔 New Enquiry Received!", options)
+    );
+  }
+});
+
+// Notification click: Opens/focuses the admin app on the enquiry page
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  if (event.action === "close") return;
+
+  const targetUrl = event.notification.data?.url || "/admin/enquiries";
+
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        // If an admin tab/window is already open, focus it and navigate
+        for (const client of clientList) {
+          if (client.url.includes("/admin") && "focus" in client) {
+            client.navigate(targetUrl);
+            return client.focus();
+          }
+        }
+        // Otherwise open a new window with the target URL
+        if (clients.openWindow) {
+          return clients.openWindow(targetUrl);
+        }
+      })
+  );
+});
+
+// -------------------------------------------------------------
+// CACHING & FETCH STRATEGY
+// -------------------------------------------------------------
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
@@ -51,7 +147,7 @@ self.addEventListener("fetch", (event) => {
   // Only handle GET requests
   if (req.method !== "GET") return;
 
-  // Do not intercept external analytics or API calls
+  // Do not intercept external analytics, Firebase, or APIs
   if (
     url.pathname.startsWith("/api/") ||
     url.hostname.includes("firestore.googleapis.com") ||
@@ -62,7 +158,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Admin HTML Navigation: Network-First
+  // Admin HTML Navigation: Network-First with offline fallback
   if (req.mode === "navigate" && url.pathname.startsWith("/admin")) {
     event.respondWith(
       fetch(req)
