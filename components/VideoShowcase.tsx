@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { dbService } from "@/lib/db";
+import { dbService, INITIAL_VIDEOS } from "@/lib/db";
 import { DbPromotionVideo, PromotionVideoSize } from "@/types/admin";
 import { parseYouTubeUrl } from "@/lib/youtube";
 
 export default function VideoShowcase() {
-  const [videos, setVideos] = useState<DbPromotionVideo[]>([]);
+  const [videos, setVideos] = useState<DbPromotionVideo[]>(() =>
+    INITIAL_VIDEOS.filter((v) => v.is_active)
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -197,7 +199,7 @@ export default function VideoShowcase() {
               <button
                 aria-label={`Play operational showcase video: ${title}`}
                 onClick={() => setIsPlaying(true)}
-                className="w-18 h-18 sm:w-22 sm:h-22 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer group ring-4 ring-white/30"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer group ring-4 ring-white/30"
                 type="button"
               >
                 <span

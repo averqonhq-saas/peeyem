@@ -193,12 +193,11 @@ export default function GalleryClientWrapper() {
       return "Conveyor Belts";
     };
 
-    let unsubGallery = () => {};
-    let unsubVideos = () => {};
+    let currentGalleryList: any[] = [];
+    let currentVideosList: DbPromotionVideo[] = [];
 
-    // Subscribe to live admin gallery updates
-    unsubGallery = dbService.subscribeGalleryImages((galleryList) => {
-      const activeGallery = (galleryList || [])
+    const refreshItems = () => {
+      const activeGallery = (currentGalleryList || [])
         .filter((g) => g.is_active)
         .sort((a, b) => a.display_order - b.display_order)
         .map((g) => ({
@@ -211,27 +210,42 @@ export default function GalleryClientWrapper() {
           description: `${g.caption} - Peeyem Traders facility and field installation.`,
         }));
 
-      dbService.getVideos().then((videos) => {
-        const videoItems: GalleryItem[] = (videos || [])
-          .filter((v) => v.is_active)
-          .map((v) => ({
-            id: v.id,
-            title: v.title,
-            category: "video" as const,
-            categoryLabel: "Video Showcase",
-            src: v.thumbnail_url || "https://img.youtube.com/vi/" + v.youtube_video_id + "/maxresdefault.jpg",
-            alt: v.title,
-            description: v.description || "Field demonstration video for industrial material handling.",
-            embedUrl: v.embed_url,
-            isVideo: true,
-          }));
+      const videoItems: GalleryItem[] = (currentVideosList || [])
+        .filter((v) => v.is_active)
+        .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+        .map((v) => ({
+          id: v.id,
+          title: v.title,
+          category: "video" as const,
+          categoryLabel: "Video Showcase",
+          src:
+            v.thumbnail_url ||
+            (v.youtube_video_id
+              ? `https://img.youtube.com/vi/${v.youtube_video_id}/maxresdefault.jpg`
+              : "https://lh3.googleusercontent.com/aida-public/AB6AXuCsKPWW63Qi05s9yRq3dC3WVHs1pOGgG0no6Y3MjGLi_56i0E1p8zpaO-7kfsFuv-Yu9neJZLOpXrIh1susAFnE3H20RCCAK3PHgnuxHqsSUbK5IS2q4a-wD3S4tfBzjGn7Ym2wtX8XA39E11B22DsUBsig1bjBhoX4tg-KUhjsgYSqQBbuWbtAQ7M5IoOIYH-xVrt7jPc0EAKyrkYJGotMwTFgZ7OAMseRPhlvdB9xKByme5YgQppGuA"),
+          alt: v.title,
+          description: v.description || "Field demonstration video for industrial material handling.",
+          embedUrl:
+            v.embed_url ||
+            (v.youtube_video_id ? `https://www.youtube.com/embed/${v.youtube_video_id}?rel=0` : undefined),
+          isVideo: true,
+        }));
 
-        if (activeGallery.length > 0) {
-          setItems([...videoItems, ...activeGallery]);
-        } else {
-          setItems([...videoItems, ...STATIC_GALLERY_ITEMS]);
-        }
-      });
+      if (activeGallery.length > 0) {
+        setItems([...videoItems, ...activeGallery]);
+      } else {
+        setItems([...videoItems, ...STATIC_GALLERY_ITEMS]);
+      }
+    };
+
+    const unsubGallery = dbService.subscribeGalleryImages((galleryList) => {
+      currentGalleryList = galleryList || [];
+      refreshItems();
+    });
+
+    const unsubVideos = dbService.subscribeVideos((videoList) => {
+      currentVideosList = videoList || [];
+      refreshItems();
     });
 
     return () => {

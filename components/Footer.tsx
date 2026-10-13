@@ -6,6 +6,7 @@ const quickLinks = [
   { name: "Home", href: "/", isHome: true },
   { name: "About", href: "/about" },
   { name: "Products", href: "/products" },
+  { name: "Promotion Videos", href: "/#video-showcase" },
   { name: "Applications", href: "/#applications" },
   { name: "Technical Resources", href: "/products#specifications" },
   { name: "Gallery", href: "/gallery" },
