@@ -47,53 +47,7 @@ export const INITIAL_PRODUCTS: DbProduct[] = PRODUCTS.map((p, idx) => ({
 
 const INITIAL_TESTIMONIALS: DbTestimonial[] = [];
 
-export const INITIAL_VIDEOS: DbPromotionVideo[] = [
-  {
-    id: "promo-vid-1",
-    title: "Heavy Duty Fabric Conveyor Belting Splicing & Jointing",
-    youtube_url: "https://www.youtube.com/watch?v=W1YV5piOBmw",
-    youtube_video_id: "W1YV5piOBmw",
-    thumbnail_url: "https://img.youtube.com/vi/W1YV5piOBmw/maxresdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/W1YV5piOBmw?rel=0",
-    description: "Step-by-step industrial fabric conveyor belt splicing and vulcanization procedure for heavy aggregate transport lines.",
-    size: "wide",
-    is_active: true,
-    is_featured: true,
-    display_order: 1,
-    created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-  },
-  {
-    id: "promo-vid-2",
-    title: "Industrial Conveyor Belt Hot Press Vulcanizing",
-    youtube_url: "https://www.youtube.com/watch?v=yPYZpwSpKmA",
-    youtube_video_id: "yPYZpwSpKmA",
-    thumbnail_url: "https://img.youtube.com/vi/yPYZpwSpKmA/maxresdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/yPYZpwSpKmA?rel=0",
-    description: "Factory technicians executing mechanical and hot press vulcanizing splicing for heavy tensile belting at our Coimbatore depot.",
-    size: "standard",
-    is_active: true,
-    is_featured: false,
-    display_order: 2,
-    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-  },
-  {
-    id: "promo-vid-3",
-    title: "Industrial Rubber & PVC Conveyor Belt Manufacturing",
-    youtube_url: "https://www.youtube.com/watch?v=tCne0Gwgczs",
-    youtube_video_id: "tCne0Gwgczs",
-    thumbnail_url: "https://img.youtube.com/vi/tCne0Gwgczs/maxresdefault.jpg",
-    embed_url: "https://www.youtube.com/embed/tCne0Gwgczs?rel=0",
-    description: "Automated calender curing and multi-ply fabric reinforcement manufacturing for high tensile industrial belting.",
-    size: "compact",
-    is_active: true,
-    is_featured: false,
-    display_order: 3,
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-  },
-];
+export const INITIAL_VIDEOS: DbPromotionVideo[] = [];
 
 const INITIAL_ENQUIRIES: DbEnquiry[] = [];
 
@@ -176,12 +130,15 @@ if (typeof window !== "undefined") {
     }
     const rawVid = localStorage.getItem("peeyem_videos");
     if (rawVid) {
-      const parsed = JSON.parse(rawVid);
-      if (!Array.isArray(parsed) || parsed.length === 0) {
-        localStorage.setItem("peeyem_videos", JSON.stringify(INITIAL_VIDEOS));
-      }
-    } else {
-      localStorage.setItem("peeyem_videos", JSON.stringify(INITIAL_VIDEOS));
+      try {
+        const parsed = JSON.parse(rawVid);
+        const filtered = Array.isArray(parsed)
+          ? parsed.filter((v: any) => !["promo-vid-1", "promo-vid-2", "promo-vid-3"].includes(v.id))
+          : [];
+        if (filtered.length !== parsed.length) {
+          localStorage.setItem("peeyem_videos", JSON.stringify(filtered));
+        }
+      } catch {}
     }
     const rawEnq = localStorage.getItem("peeyem_enquiries");
     if (rawEnq) {
@@ -549,10 +506,8 @@ export const dbService = {
         unsubscribeFirestore = onSnapshot(
           q,
           (snap) => {
-            if (!snap.empty) {
-              const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbPromotionVideo));
-              callback(list);
-            }
+            const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbPromotionVideo));
+            callback(list);
           },
           (err) => console.warn("Firestore videos onSnapshot warning:", err)
         );
@@ -878,26 +833,16 @@ export const dbService = {
     if (isFirebaseConfigured && firestoreDb) {
       try {
         const snap = await getDocs(collection(firestoreDb, "videos"));
-        if (!snap.empty) {
-          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbPromotionVideo));
-          return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        } else {
-          // If Firestore is empty, seed initial promotional videos
-          for (const v of INITIAL_VIDEOS) {
-            await setDoc(doc(firestoreDb, "videos", v.id), v, { merge: true });
-          }
-          return INITIAL_VIDEOS;
-        }
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as DbPromotionVideo));
+        return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
       } catch (e) {
         console.warn("Firestore videos error:", e);
       }
     }
-    const local = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
-    const currentVideos = Array.isArray(local) && local.length > 0 ? local : INITIAL_VIDEOS;
-    if (!local || local.length === 0) {
-      setLocal("videos", INITIAL_VIDEOS);
-      broadcastSync("videos");
-    }
+    const local = getLocal<DbPromotionVideo[]>("videos", []);
+    const currentVideos = Array.isArray(local)
+      ? local.filter((v) => !["promo-vid-1", "promo-vid-2", "promo-vid-3"].includes(v.id))
+      : [];
     return [...currentVideos].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   },
 
@@ -919,7 +864,7 @@ export const dbService = {
       }
     }
 
-    const current = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
+    const current = getLocal<DbPromotionVideo[]>("videos", []);
     setLocal("videos", [item, ...current]);
     broadcastSync("videos");
     return item;
@@ -936,7 +881,7 @@ export const dbService = {
       }
     }
 
-    const current = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
+    const current = getLocal<DbPromotionVideo[]>("videos", []);
     let updated: DbPromotionVideo | null = null;
     const next = current.map((v) => {
       if (v.id === id) {
@@ -958,7 +903,7 @@ export const dbService = {
         console.warn("Firestore deleteVideo error:", e);
       }
     }
-    const current = getLocal<DbPromotionVideo[]>("videos", INITIAL_VIDEOS);
+    const current = getLocal<DbPromotionVideo[]>("videos", []);
     setLocal("videos", current.filter((v) => v.id !== id));
     broadcastSync("videos");
   },
